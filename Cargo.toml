@@ -1,0 +1,69 @@
+[package]
+name = "mrly-core"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+rust-version.workspace = true
+keywords.workspace = true
+categories.workspace = true
+description = "The substrate: tensors, cells, colors, images, resampling, seeded chance and the canonical names."
+readme = "README.md"
+include = ["src/**", "bridge.toml", "manifest.json", "README.md", "LICENSE"]
+
+[features]
+js = ["dep:wasm-bindgen", "dep:serde-wasm-bindgen", "dep:js-sys"]
+py = ["dep:pyo3", "dep:numpy", "dep:pythonize"]
+cli = []
+
+[lints]
+workspace = true
+
+[dependencies]
+serde.workspace = true
+serde_json.workspace = true
+wasm-bindgen = { workspace = true, optional = true }
+serde-wasm-bindgen = { workspace = true, optional = true }
+js-sys = { workspace = true, optional = true }
+pyo3 = { version = "0.29", features = ["abi3-py310"], optional = true }
+numpy = { version = "0.29", optional = true }
+pythonize = { version = "0.29", optional = true }
+
+[workspace]
+members = ["js", "py", "cli"]
+
+[workspace.package]
+version = "0.2.0"
+edition = "2024"
+license = "MIT"
+repository = "https://github.com/mrlyprod/core"
+homepage = "https://mrly.net"
+rust-version = "1.96"
+keywords = ["mathematics", "fractal", "cellular-automata", "generative"]
+categories = ["mathematics", "science", "multimedia::images"]
+
+[workspace.lints.rust]
+missing_docs = "deny"
+unsafe_code = "forbid"
+unreachable_pub = "warn"
+
+[profile.release]
+lto = true
+codegen-units = 1
+
+[profile.test]
+opt-level = 1
+
+[profile.wasm]
+inherits = "release"
+opt-level = "s"
+strip = true
+
+[workspace.dependencies]
+mrly-core = { path = ".", version = "0.2.0" }
+serde = { version = "1", features = ["derive"] }
+serde_json = { version = "1", features = ["preserve_order"] }
+wasm-bindgen = "=0.2.125"
+serde-wasm-bindgen = "0.6"
+js-sys = "0.3"
