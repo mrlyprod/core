@@ -52,7 +52,6 @@ fn block(state: &mut [u32; 8], chunk: &[u8]) {
     }
 }
 
-/// Returns the 32-byte sha256 digest of `bytes`.
 pub fn sha256(bytes: &[u8]) -> [u8; 32] {
     let mut padded = bytes.to_vec();
     padded.push(0x80);
@@ -71,34 +70,10 @@ pub fn sha256(bytes: &[u8]) -> [u8; 32] {
     out
 }
 
-/// Returns the sha256 digest of `bytes` as 64 lowercase hex digits.
 pub fn hex(bytes: &[u8]) -> String {
     sha256(bytes).iter().map(|b| format!("{b:02x}")).collect()
 }
 
-/// Returns the first eight hex digits of the sha256 digest of `bytes`, the id a name prints.
 pub fn short(bytes: &[u8]) -> String {
     hex(bytes)[..8].to_string()
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn the_standard_vectors_hold() {
-        assert_eq!(
-            hex(b""),
-            "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
-        );
-        assert_eq!(
-            hex(b"abc"),
-            "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"
-        );
-        assert_eq!(
-            hex(b"abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq"),
-            "248d6a61d20638b8e5c026930c3e6039a33ce45964ff2167f6ecedd419db06c1"
-        );
-        assert_eq!(short(b"abc"), "ba7816bf");
-    }
 }

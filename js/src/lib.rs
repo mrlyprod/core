@@ -3,7 +3,6 @@
 use mrly_core::hand::js as hand;
 use wasm_bindgen::prelude::*;
 
-/// Flips every type to one minus itself, same as invert.
 #[wasm_bindgen]
 pub fn core_cell_anti(cell: JsValue) -> Result<JsValue, JsValue> {
     let cell = hand::cell_from_js(&cell)?;
@@ -11,7 +10,6 @@ pub fn core_cell_anti(cell: JsValue) -> Result<JsValue, JsValue> {
     hand::cell_to_js(&value)
 }
 
-/// Maps every type to one at or above the threshold and zero below, dropping colors.
 #[wasm_bindgen]
 pub fn core_cell_binarize(cell: JsValue, threshold: u8) -> Result<JsValue, JsValue> {
     let cell = hand::cell_from_js(&cell)?;
@@ -19,7 +17,6 @@ pub fn core_cell_binarize(cell: JsValue, threshold: u8) -> Result<JsValue, JsVal
     hand::cell_to_js(&value)
 }
 
-/// Binarizes the types at Otsu's threshold, dropping colors.
 #[wasm_bindgen]
 pub fn core_cell_binarize_otsu(cell: JsValue) -> Result<JsValue, JsValue> {
     let cell = hand::cell_from_js(&cell)?;
@@ -27,7 +24,6 @@ pub fn core_cell_binarize_otsu(cell: JsValue) -> Result<JsValue, JsValue> {
     hand::cell_to_js(&value)
 }
 
-/// Replaces every type with the rounded mean of its masked neighborhood, dropping colors.
 #[wasm_bindgen]
 pub fn core_cell_blur(cell: JsValue, mask: JsValue, wrap: bool) -> Result<JsValue, JsValue> {
     let cell = hand::cell_from_js(&cell)?;
@@ -36,7 +32,6 @@ pub fn core_cell_blur(cell: JsValue, mask: JsValue, wrap: bool) -> Result<JsValu
     hand::cell_to_js(&value)
 }
 
-/// Returns the painted color at a flat index, or transparent while unpainted or past the end.
 #[wasm_bindgen]
 pub fn core_cell_color_at(cell: JsValue, flat: usize) -> Result<Vec<u8>, JsValue> {
     let cell = hand::cell_from_js(&cell)?;
@@ -44,7 +39,6 @@ pub fn core_cell_color_at(cell: JsValue, flat: usize) -> Result<Vec<u8>, JsValue
     Ok(value.to_vec())
 }
 
-/// Builds the Kronecker product of the two cells' types.
 #[wasm_bindgen]
 pub fn core_cell_combine(cell: JsValue, other: JsValue) -> Result<JsValue, JsValue> {
     let cell = hand::cell_from_js(&cell)?;
@@ -53,7 +47,6 @@ pub fn core_cell_combine(cell: JsValue, other: JsValue) -> Result<JsValue, JsVal
     hand::cell_to_js(&value)
 }
 
-/// Grows the types to the level-fold Kronecker power of themselves, dropping colors and tags.
 #[wasm_bindgen]
 pub fn core_cell_fractal(cell: JsValue, level: usize) -> Result<JsValue, JsValue> {
     let cell = hand::cell_from_js(&cell)?;
@@ -61,7 +54,6 @@ pub fn core_cell_fractal(cell: JsValue, level: usize) -> Result<JsValue, JsValue
     hand::cell_to_js(&value)
 }
 
-/// Flips every type to one minus itself.
 #[wasm_bindgen]
 pub fn core_cell_invert(cell: JsValue) -> Result<JsValue, JsValue> {
     let cell = hand::cell_from_js(&cell)?;
@@ -69,7 +61,6 @@ pub fn core_cell_invert(cell: JsValue) -> Result<JsValue, JsValue> {
     hand::cell_to_js(&value)
 }
 
-/// Tags every cell with its concentric shell distance from the center.
 #[wasm_bindgen]
 pub fn core_cell_layers(cell: JsValue, dtype: JsValue) -> Result<JsValue, JsValue> {
     let cell = hand::cell_from_js(&cell)?;
@@ -78,7 +69,6 @@ pub fn core_cell_layers(cell: JsValue, dtype: JsValue) -> Result<JsValue, JsValu
     hand::cell_to_js(&value)
 }
 
-/// Folds at least two cells into one by chained Kronecker products.
 #[wasm_bindgen]
 pub fn core_cell_magic(cells: JsValue) -> Result<JsValue, JsValue> {
     let cells = hand::list_from_js(&cells, hand::cell_from_js)?;
@@ -86,7 +76,6 @@ pub fn core_cell_magic(cells: JsValue) -> Result<JsValue, JsValue> {
     hand::cell_to_js(&value)
 }
 
-/// Returns the default mapping of the first six types to white, black, alpha, red, green, and blue.
 #[wasm_bindgen]
 pub fn core_cell_mapping() -> Result<JsValue, JsValue> {
     let value = mrly_core::cell::mapping();
@@ -95,7 +84,6 @@ pub fn core_cell_mapping() -> Result<JsValue, JsValue> {
     })
 }
 
-/// Stitches same-shaped cells into one grid of reps blocks per axis.
 #[wasm_bindgen]
 pub fn core_cell_merge(cells: JsValue, reps: &[usize]) -> Result<JsValue, JsValue> {
     let cells = hand::list_from_js(&cells, hand::cell_from_js)?;
@@ -103,14 +91,12 @@ pub fn core_cell_merge(cells: JsValue, reps: &[usize]) -> Result<JsValue, JsValu
     hand::cell_to_js(&value)
 }
 
-/// Builds the 3-wide Moore mask of the dimension, every site on but the center.
 #[wasm_bindgen]
 pub fn core_cell_moore(dimension: usize) -> Result<JsValue, JsValue> {
     let value = mrly_core::cell::moore(dimension);
     hand::tensor_to_js(&value)
 }
 
-/// Lays the cell each mask entry indexes into that entry's place and merges the lot.
 #[wasm_bindgen]
 pub fn core_cell_mosaic(mask: JsValue, cells: JsValue) -> Result<JsValue, JsValue> {
     let mask = hand::tensor_from_js(&mask)?;
@@ -119,7 +105,6 @@ pub fn core_cell_mosaic(mask: JsValue, cells: JsValue) -> Result<JsValue, JsValu
     hand::cell_to_js(&value)
 }
 
-/// Tags every cell with its count of target-valued neighbors under the mask.
 #[wasm_bindgen]
 pub fn core_cell_neighbors(
     cell: JsValue,
@@ -137,7 +122,6 @@ pub fn core_cell_neighbors(
     hand::cell_to_js(&value)
 }
 
-/// Wraps a tensor of types in a bare cell, colorless and tagless.
 #[wasm_bindgen]
 pub fn core_cell_new(types: JsValue) -> Result<JsValue, JsValue> {
     let types = hand::tensor_from_js(&types)?;
@@ -145,7 +129,6 @@ pub fn core_cell_new(types: JsValue) -> Result<JsValue, JsValue> {
     hand::cell_to_js(&value)
 }
 
-/// Wraps the cell in count layers of value on every side, dropping colors.
 #[wasm_bindgen]
 pub fn core_cell_pad(cell: JsValue, count: usize, value: u8) -> Result<JsValue, JsValue> {
     let cell = hand::cell_from_js(&cell)?;
@@ -153,7 +136,6 @@ pub fn core_cell_pad(cell: JsValue, count: usize, value: u8) -> Result<JsValue, 
     hand::cell_to_js(&value)
 }
 
-/// Colors every mapped cell, picking within each type's palette by the mode.
 #[wasm_bindgen]
 pub fn core_cell_paint(
     cell: JsValue,
@@ -175,7 +157,6 @@ pub fn core_cell_paint(
     hand::cell_to_js(&value)
 }
 
-/// Stamps value wherever the tiled mask is on, dropping colors.
 #[wasm_bindgen]
 pub fn core_cell_perforate(cell: JsValue, mask: JsValue, value: u8) -> Result<JsValue, JsValue> {
     let cell = hand::cell_from_js(&cell)?;
@@ -184,7 +165,6 @@ pub fn core_cell_perforate(cell: JsValue, mask: JsValue, value: u8) -> Result<Js
     hand::cell_to_js(&value)
 }
 
-/// Rebuilds a cell's types, colors and tags at the new shape from one destination-to-source index map.
 #[wasm_bindgen]
 pub fn core_cell_remap(cell: JsValue, map: &[usize], shape: &[usize]) -> Result<JsValue, JsValue> {
     let cell = hand::cell_from_js(&cell)?;
@@ -192,7 +172,6 @@ pub fn core_cell_remap(cell: JsValue, map: &[usize], shape: &[usize]) -> Result<
     hand::cell_to_js(&value)
 }
 
-/// Returns the flat rgba bytes of the cells, four to a cell, the stored color where there is one and opaque black everywhere else.
 #[wasm_bindgen]
 pub fn core_cell_rgba(cell: JsValue) -> Result<Vec<u8>, JsValue> {
     let cell = hand::cell_from_js(&cell)?;
@@ -200,7 +179,6 @@ pub fn core_cell_rgba(cell: JsValue) -> Result<Vec<u8>, JsValue> {
     Ok(value)
 }
 
-/// Builds the flat source index of every destination cell after k quarter turns in the plane of the axes.
 #[wasm_bindgen]
 pub fn core_cell_rot90_map(
     shape: &[usize],
@@ -212,7 +190,6 @@ pub fn core_cell_rot90_map(
     Ok(value)
 }
 
-/// Rotates the cell k quarter turns in the plane of the given axes, carrying colors and tags along.
 #[wasm_bindgen]
 pub fn core_cell_rotate(cell: JsValue, k: usize, axes: JsValue) -> Result<JsValue, JsValue> {
     let cell = hand::cell_from_js(&cell)?;
@@ -221,7 +198,6 @@ pub fn core_cell_rotate(cell: JsValue, k: usize, axes: JsValue) -> Result<JsValu
     hand::cell_to_js(&value)
 }
 
-/// Returns the shape of the type tensor.
 #[wasm_bindgen]
 pub fn core_cell_shape(cell: JsValue) -> Result<Vec<usize>, JsValue> {
     let cell = hand::cell_from_js(&cell)?;
@@ -229,7 +205,6 @@ pub fn core_cell_shape(cell: JsValue) -> Result<Vec<usize>, JsValue> {
     Ok(value.to_vec())
 }
 
-/// Returns the number of cells.
 #[wasm_bindgen]
 pub fn core_cell_size(cell: JsValue) -> Result<usize, JsValue> {
     let cell = hand::cell_from_js(&cell)?;
@@ -237,7 +212,6 @@ pub fn core_cell_size(cell: JsValue) -> Result<usize, JsValue> {
     Ok(value)
 }
 
-/// Repeats the cell reps times along each axis, carrying colors and tags along.
 #[wasm_bindgen]
 pub fn core_cell_tile(cell: JsValue, reps: &[usize]) -> Result<JsValue, JsValue> {
     let cell = hand::cell_from_js(&cell)?;
@@ -245,14 +219,12 @@ pub fn core_cell_tile(cell: JsValue, reps: &[usize]) -> Result<JsValue, JsValue>
     hand::cell_to_js(&value)
 }
 
-/// Builds the flat source index of every destination cell after tiling reps copies per axis.
 #[wasm_bindgen]
 pub fn core_cell_tile_map(shape: &[usize], reps: &[usize]) -> Result<Vec<usize>, JsValue> {
     let value = mrly_core::cell::tile_map(shape, reps).map_err(hand::throw)?;
     Ok(value)
 }
 
-/// Returns the color with its alpha set to level.
 #[wasm_bindgen]
 pub fn core_colors_alpha(color: JsValue, level: u8) -> Result<JsValue, JsValue> {
     let color = hand::color_from_js(&color)?;
@@ -260,14 +232,12 @@ pub fn core_colors_alpha(color: JsValue, level: u8) -> Result<JsValue, JsValue> 
     Ok(hand::color_to_js(value))
 }
 
-/// Returns the ground rgba of the dark or the light theme.
 #[wasm_bindgen]
 pub fn core_colors_board(dark: bool) -> Result<Vec<u8>, JsValue> {
     let value = mrly_core::colors::board(dark);
     Ok(value.to_vec())
 }
 
-/// Formats the color as a css rgb or rgba call.
 #[wasm_bindgen]
 pub fn core_colors_css(color: JsValue) -> Result<String, JsValue> {
     let color = hand::color_from_js(&color)?;
@@ -275,14 +245,12 @@ pub fn core_colors_css(color: JsValue) -> Result<String, JsValue> {
     Ok(value)
 }
 
-/// Parses a #RRGGBB or #RRGGBBAA code, hash optional.
 #[wasm_bindgen]
 pub fn core_colors_from_hex(hex: &str) -> Result<JsValue, JsValue> {
     let value = mrly_core::Color::from_hex(hex).map_err(hand::throw)?;
     Ok(hand::color_to_js(value))
 }
 
-/// Builds a gradient of steps colors sweeping evenly through the given stops.
 #[wasm_bindgen]
 pub fn core_colors_gradient(colors: JsValue, steps: usize) -> Result<JsValue, JsValue> {
     let colors = hand::list_from_js(&colors, hand::color_from_js)?;
@@ -290,14 +258,12 @@ pub fn core_colors_gradient(colors: JsValue, steps: usize) -> Result<JsValue, Js
     hand::list_to_js(&value, |x1| Ok(hand::color_to_js(*x1)))
 }
 
-/// Returns the foreground rgba of the dark or the light theme.
 #[wasm_bindgen]
 pub fn core_colors_ink(dark: bool) -> Result<Vec<u8>, JsValue> {
     let value = mrly_core::colors::ink(dark);
     Ok(value.to_vec())
 }
 
-/// Returns the color with every channel flipped and the alpha kept.
 #[wasm_bindgen]
 pub fn core_colors_invert(color: JsValue) -> Result<JsValue, JsValue> {
     let color = hand::color_from_js(&color)?;
@@ -305,7 +271,6 @@ pub fn core_colors_invert(color: JsValue) -> Result<JsValue, JsValue> {
     Ok(hand::color_to_js(value))
 }
 
-/// Returns the color scaled toward black below level 50 and toward white above.
 #[wasm_bindgen]
 pub fn core_colors_lightness(color: JsValue, level: u8) -> Result<JsValue, JsValue> {
     let color = hand::color_from_js(&color)?;
@@ -313,7 +278,6 @@ pub fn core_colors_lightness(color: JsValue, level: u8) -> Result<JsValue, JsVal
     Ok(hand::color_to_js(value))
 }
 
-/// Reads rgba pixels as a type grid, one wherever the rgb mean falls below the level.
 #[wasm_bindgen]
 pub fn core_colors_luma_types(
     pixels: JsValue,
@@ -326,7 +290,6 @@ pub fn core_colors_luma_types(
     hand::tensor_to_js(&value)
 }
 
-/// Blends two colors linearly by ratio.
 #[wasm_bindgen]
 pub fn core_colors_mix(color_1: JsValue, color_2: JsValue, ratio: f64) -> Result<JsValue, JsValue> {
     let color_1 = hand::color_from_js(&color_1)?;
@@ -335,35 +298,30 @@ pub fn core_colors_mix(color_1: JsValue, color_2: JsValue, ratio: f64) -> Result
     Ok(hand::color_to_js(value))
 }
 
-/// Returns the palette color a name spells.
 #[wasm_bindgen]
 pub fn core_colors_named(name: &str) -> Result<JsValue, JsValue> {
     let value = mrly_core::colors::named(name).map_err(hand::throw)?;
     Ok(hand::color_to_js(value))
 }
 
-/// Draws a color from the stream, opaque unless alpha is asked for.
 #[wasm_bindgen]
 pub fn core_colors_random(alpha: bool, rng: &mut hand::Rng) -> Result<JsValue, JsValue> {
     let value = mrly_core::Color::random(alpha, rng.stream());
     Ok(hand::color_to_js(value))
 }
 
-/// Builds an opaque color.
 #[wasm_bindgen]
 pub fn core_colors_rgb(r: u8, g: u8, b: u8) -> Result<JsValue, JsValue> {
     let value = mrly_core::Color::rgb(r, g, b);
     Ok(hand::color_to_js(value))
 }
 
-/// Builds a color with an explicit alpha.
 #[wasm_bindgen]
 pub fn core_colors_rgba(r: u8, g: u8, b: u8, a: u8) -> Result<JsValue, JsValue> {
     let value = mrly_core::Color::rgba(r, g, b, a);
     Ok(hand::color_to_js(value))
 }
 
-/// Returns a hue one shade lighter, itself, and one shade darker.
 #[wasm_bindgen]
 pub fn core_colors_shades(hue: JsValue) -> Result<JsValue, JsValue> {
     let hue = hand::color_from_js(&hue)?;
@@ -371,7 +329,6 @@ pub fn core_colors_shades(hue: JsValue) -> Result<JsValue, JsValue> {
     hand::list_to_js(&value, |x1| Ok(hand::color_to_js(*x1)))
 }
 
-/// Snaps every pixel to the palette color nearest it in squared rgba distance, first on a tie.
 #[wasm_bindgen]
 pub fn core_colors_snap(pixels: JsValue, palette: JsValue) -> Result<JsValue, JsValue> {
     let pixels = hand::from_js::<Vec<[u8; 4]>>(&pixels)?;
@@ -380,7 +337,6 @@ pub fn core_colors_snap(pixels: JsValue, palette: JsValue) -> Result<JsValue, Js
     hand::list_to_js(&value, |x1| Ok(hand::typed(&(*x1)[..])))
 }
 
-/// Formats the color as lowercase hex, appending the alpha pair only when not opaque.
 #[wasm_bindgen]
 pub fn core_colors_to_hex(color: JsValue) -> Result<String, JsValue> {
     let color = hand::color_from_js(&color)?;
@@ -388,14 +344,12 @@ pub fn core_colors_to_hex(color: JsValue) -> Result<String, JsValue> {
     Ok(value)
 }
 
-/// Parses JSON text into a value.
 #[wasm_bindgen]
 pub fn core_error_parse(text: &str) -> Result<JsValue, JsValue> {
     let value = mrly_core::error::parse(text).map_err(hand::throw)?;
     hand::to_js(&value)
 }
 
-/// Squashes rgba pixels to the hex aspect, returning the new width, height and pixels.
 #[wasm_bindgen]
 pub fn core_hex_fit(
     pixels: JsValue,
@@ -415,14 +369,12 @@ pub fn core_hex_fit(
     ]))
 }
 
-/// Returns the size a hex rendering wears, the named axis squashed by the triangle ratio.
 #[wasm_bindgen]
 pub fn core_hex_size(width: usize, height: usize, vertical: bool) -> Result<JsValue, JsValue> {
     let value = mrly_core::hex_size(width, height, vertical);
     hand::to_js(&value)
 }
 
-/// Box-blurs rgba pixels by radius, each channel the mean of its edge-padded window.
 #[wasm_bindgen]
 pub fn core_image_blur(
     pixels: JsValue,
@@ -435,7 +387,6 @@ pub fn core_image_blur(
     hand::list_to_js(&value, |x1| Ok(hand::typed(&(*x1)[..])))
 }
 
-/// Builds an image from its width, its height and its colors.
 #[wasm_bindgen]
 pub fn core_image_new(width: usize, height: usize, colors: JsValue) -> Result<JsValue, JsValue> {
     let colors = hand::from_js::<Vec<[u8; 4]>>(&colors)?;
@@ -443,7 +394,6 @@ pub fn core_image_new(width: usize, height: usize, colors: JsValue) -> Result<Js
     hand::image_to_js(&value)
 }
 
-/// Resamples the image to a new size.
 #[wasm_bindgen]
 pub fn core_image_resample(
     image: JsValue,
@@ -457,7 +407,6 @@ pub fn core_image_resample(
     hand::image_to_js(&value)
 }
 
-/// Draws every pixel as a scale by scale block, growing both sides by scale.
 #[wasm_bindgen]
 pub fn core_image_scale(image: JsValue, scale: usize) -> Result<JsValue, JsValue> {
     let image = hand::image_from_js(&image)?;
@@ -465,28 +414,24 @@ pub fn core_image_scale(image: JsValue, scale: usize) -> Result<JsValue, JsValue
     hand::image_to_js(&value)
 }
 
-/// Returns the sha256 digest of `bytes` as 64 lowercase hex digits.
 #[wasm_bindgen]
 pub fn core_name_sha_hex(bytes: &[u8]) -> Result<String, JsValue> {
     let value = mrly_core::name::sha::hex(bytes);
     Ok(value)
 }
 
-/// Returns the 32-byte sha256 digest of `bytes`.
 #[wasm_bindgen]
 pub fn core_name_sha_sha256(bytes: &[u8]) -> Result<Vec<u8>, JsValue> {
     let value = mrly_core::name::sha::sha256(bytes);
     Ok(value.to_vec())
 }
 
-/// Returns the first eight hex digits of the sha256 digest of `bytes`, the id a name prints.
 #[wasm_bindgen]
 pub fn core_name_sha_short(bytes: &[u8]) -> Result<String, JsValue> {
     let value = mrly_core::name::sha::short(bytes);
     Ok(value)
 }
 
-/// Colors the cell from the paint's inks under its edition mode, scattering the Random edition from the stream.
 #[wasm_bindgen]
 pub fn core_paint_apply(
     paint: &core_paint_Paint,
@@ -499,7 +444,6 @@ pub fn core_paint_apply(
     Ok(())
 }
 
-/// Replays a stored paint onto a cell, tagging first and applying it from the stream.
 #[wasm_bindgen]
 pub fn core_paint_coat(
     cell: JsValue,
@@ -515,7 +459,6 @@ pub fn core_paint_coat(
     Ok(())
 }
 
-/// Draws a random paint under the config, applies it to the cell, and returns the recipe.
 #[wasm_bindgen]
 pub fn core_paint_paint(
     cell: JsValue,
@@ -532,7 +475,6 @@ pub fn core_paint_paint(
     Ok(core_paint_Paint { inner: value })
 }
 
-/// Tags the cell for Layers and Neighbors paints and sizes the palette to the tag count.
 #[wasm_bindgen]
 pub fn core_paint_prime(
     paint: &core_paint_Paint,
@@ -553,7 +495,6 @@ pub fn core_paint_prime(
     Ok(core_paint_Paint { inner: value })
 }
 
-/// Draws a random edition from the allowed list, or from all seven.
 #[wasm_bindgen]
 pub fn core_paint_random_edition(
     editions: JsValue,
@@ -564,7 +505,6 @@ pub fn core_paint_random_edition(
     hand::to_js(&value)
 }
 
-/// Redraws the paint's secondary inks and shades under its scheme.
 #[wasm_bindgen]
 pub fn core_paint_reroll(
     paint: &core_paint_Paint,
@@ -574,7 +514,6 @@ pub fn core_paint_reroll(
     Ok(core_paint_Paint { inner: value })
 }
 
-/// Draws the paint's scheme, target and primary under the config, then rerolls the rest.
 #[wasm_bindgen]
 pub fn core_paint_setup(
     paint: &core_paint_Paint,
@@ -586,7 +525,6 @@ pub fn core_paint_setup(
     Ok(core_paint_Paint { inner: value })
 }
 
-/// Tags the cell for the Layers and Neighbors editions and returns the distinct tag count on the secondary side.
 #[wasm_bindgen]
 pub fn core_paint_tag(
     cell: JsValue,
@@ -604,7 +542,6 @@ pub fn core_paint_tag(
     Ok(value)
 }
 
-/// Returns the color for one value against the range maximum: the background at zero, the top of the ramp from the maximum up.
 #[wasm_bindgen]
 pub fn core_ramp_color(colorizer: JsValue, value: usize, max: usize) -> Result<JsValue, JsValue> {
     let colorizer = hand::from_js::<mrly_core::Colorizer>(&colorizer)?;
@@ -612,7 +549,6 @@ pub fn core_ramp_color(colorizer: JsValue, value: usize, max: usize) -> Result<J
     Ok(hand::color_to_js(value))
 }
 
-/// Maps a slice of values to rgba pixels against the range maximum.
 #[wasm_bindgen]
 pub fn core_ramp_colors(
     colorizer: JsValue,
@@ -624,7 +560,6 @@ pub fn core_ramp_colors(
     hand::list_to_js(&value, |x1| Ok(hand::typed(&(*x1)[..])))
 }
 
-/// Resamples rgba pixels to a new size.
 #[wasm_bindgen]
 pub fn core_resample(
     pixels: JsValue,
@@ -641,28 +576,24 @@ pub fn core_resample(
     hand::list_to_js(&value, |x1| Ok(hand::typed(&(*x1)[..])))
 }
 
-/// Draws an integer below n, or zero when n is zero.
 #[wasm_bindgen]
 pub fn core_rng_below(rng: &mut hand::Rng, n: usize) -> Result<usize, JsValue> {
     let value = rng.stream().below(n);
     Ok(value)
 }
 
-/// Draws a fair coin flip.
 #[wasm_bindgen]
 pub fn core_rng_boolean(rng: &mut hand::Rng) -> Result<bool, JsValue> {
     let value = rng.stream().boolean();
     Ok(value)
 }
 
-/// Returns true with probability p.
 #[wasm_bindgen]
 pub fn core_rng_chance(rng: &mut hand::Rng, p: f64) -> Result<bool, JsValue> {
     let value = rng.stream().chance(p);
     Ok(value)
 }
 
-/// Builds the stream from a seed.
 #[wasm_bindgen]
 pub fn core_rng_new(seed: JsValue) -> Result<hand::Rng, JsValue> {
     let seed = hand::u64_from_js(&seed)?;
@@ -670,7 +601,6 @@ pub fn core_rng_new(seed: JsValue) -> Result<hand::Rng, JsValue> {
     Ok(hand::Rng::wrap(value))
 }
 
-/// Draws an integer between lo and hi inclusive, or lo when hi is not above lo.
 #[wasm_bindgen]
 pub fn core_rng_range(rng: &mut hand::Rng, lo: JsValue, hi: JsValue) -> Result<i64, JsValue> {
     let lo = hand::i64_from_js(&lo)?;
@@ -679,7 +609,6 @@ pub fn core_rng_range(rng: &mut hand::Rng, lo: JsValue, hi: JsValue) -> Result<i
     Ok(value)
 }
 
-/// Draws amount distinct indices below length, or every index when amount is larger.
 #[wasm_bindgen]
 pub fn core_rng_sample_indices(
     rng: &mut hand::Rng,
@@ -690,14 +619,12 @@ pub fn core_rng_sample_indices(
     Ok(value)
 }
 
-/// Draws a float at or above zero and below one.
 #[wasm_bindgen]
 pub fn core_rng_unit(rng: &mut hand::Rng) -> Result<f64, JsValue> {
     let value = rng.stream().unit();
     Ok(value)
 }
 
-/// Returns the element at a flat index, which must be below the size like a slice index.
 #[wasm_bindgen]
 pub fn core_tensor_at(tensor: JsValue, flat: usize) -> Result<i64, JsValue> {
     let tensor = hand::tensor_from_js(&tensor)?;
@@ -705,7 +632,6 @@ pub fn core_tensor_at(tensor: JsValue, flat: usize) -> Result<i64, JsValue> {
     Ok(value)
 }
 
-/// Maps every element to one at or above the threshold, zero below.
 #[wasm_bindgen]
 pub fn core_tensor_binarize(tensor: JsValue, threshold: u8) -> Result<JsValue, JsValue> {
     let tensor = hand::tensor_from_js(&tensor)?;
@@ -713,7 +639,6 @@ pub fn core_tensor_binarize(tensor: JsValue, threshold: u8) -> Result<JsValue, J
     hand::tensor_to_js(&value)
 }
 
-/// Binarizes at one above the Otsu threshold.
 #[wasm_bindgen]
 pub fn core_tensor_binarize_otsu(tensor: JsValue) -> Result<JsValue, JsValue> {
     let tensor = hand::tensor_from_js(&tensor)?;
@@ -721,7 +646,6 @@ pub fn core_tensor_binarize_otsu(tensor: JsValue) -> Result<JsValue, JsValue> {
     hand::tensor_to_js(&value)
 }
 
-/// Averages every position over its masked neighborhood, rounded.
 #[wasm_bindgen]
 pub fn core_tensor_blur(tensor: JsValue, mask: JsValue, wrap: bool) -> Result<JsValue, JsValue> {
     let tensor = hand::tensor_from_js(&tensor)?;
@@ -730,7 +654,6 @@ pub fn core_tensor_blur(tensor: JsValue, mask: JsValue, wrap: bool) -> Result<Js
     hand::tensor_to_js(&value)
 }
 
-/// Returns the elements as bytes.
 #[wasm_bindgen]
 pub fn core_tensor_bytes(tensor: JsValue) -> Result<Vec<u8>, JsValue> {
     let tensor = hand::tensor_from_js(&tensor)?;
@@ -738,7 +661,6 @@ pub fn core_tensor_bytes(tensor: JsValue) -> Result<Vec<u8>, JsValue> {
     Ok(value.to_vec())
 }
 
-/// Counts the cells holding one value.
 #[wasm_bindgen]
 pub fn core_tensor_count(tensor: JsValue, value: u8) -> Result<usize, JsValue> {
     let tensor = hand::tensor_from_js(&tensor)?;
@@ -746,7 +668,6 @@ pub fn core_tensor_count(tensor: JsValue, value: u8) -> Result<usize, JsValue> {
     Ok(value)
 }
 
-/// Returns the element width.
 #[wasm_bindgen]
 pub fn core_tensor_dtype(tensor: JsValue) -> Result<JsValue, JsValue> {
     let tensor = hand::tensor_from_js(&tensor)?;
@@ -754,7 +675,6 @@ pub fn core_tensor_dtype(tensor: JsValue) -> Result<JsValue, JsValue> {
     hand::to_js(&value)
 }
 
-/// Counts the faces where filled cells meet empty cells or the boundary: perimeter in 2d, surface in 3d.
 #[wasm_bindgen]
 pub fn core_tensor_exposed(tensor: JsValue) -> Result<JsValue, JsValue> {
     let tensor = hand::tensor_from_js(&tensor)?;
@@ -762,7 +682,6 @@ pub fn core_tensor_exposed(tensor: JsValue) -> Result<JsValue, JsValue> {
     Ok(JsValue::from_str(&value.to_string()))
 }
 
-/// Builds a tensor of the shape and width filled with one value.
 #[wasm_bindgen]
 pub fn core_tensor_filled(
     shape: Vec<usize>,
@@ -775,7 +694,6 @@ pub fn core_tensor_filled(
     hand::tensor_to_js(&value)
 }
 
-/// Reverses the tensor along one axis.
 #[wasm_bindgen]
 pub fn core_tensor_flip(tensor: JsValue, axis: usize) -> Result<JsValue, JsValue> {
     let tensor = hand::tensor_from_js(&tensor)?;
@@ -783,7 +701,6 @@ pub fn core_tensor_flip(tensor: JsValue, axis: usize) -> Result<JsValue, JsValue
     hand::tensor_to_js(&value)
 }
 
-/// Folds the tensor into its level-fold Kronecker power.
 #[wasm_bindgen]
 pub fn core_tensor_fractal(tensor: JsValue, level: usize) -> Result<JsValue, JsValue> {
     let tensor = hand::tensor_from_js(&tensor)?;
@@ -791,14 +708,12 @@ pub fn core_tensor_fractal(tensor: JsValue, level: usize) -> Result<JsValue, JsV
     hand::tensor_to_js(&value)
 }
 
-/// Builds a u8 tensor filled with one value.
 #[wasm_bindgen]
 pub fn core_tensor_full(shape: Vec<usize>, value: u8) -> Result<JsValue, JsValue> {
     let value = mrly_core::Tensor::full(shape, value);
     hand::tensor_to_js(&value)
 }
 
-/// Returns the byte at a multi-index.
 #[wasm_bindgen]
 pub fn core_tensor_get(tensor: JsValue, multi: &[usize]) -> Result<u8, JsValue> {
     let tensor = hand::tensor_from_js(&tensor)?;
@@ -806,14 +721,12 @@ pub fn core_tensor_get(tensor: JsValue, multi: &[usize]) -> Result<u8, JsValue> 
     Ok(value)
 }
 
-/// Wraps an i32 vector as a tensor of the shape.
 #[wasm_bindgen]
 pub fn core_tensor_i32(data: Vec<i32>, shape: Vec<usize>) -> Result<JsValue, JsValue> {
     let value = mrly_core::Tensor::i32(data, shape).map_err(hand::throw)?;
     hand::tensor_to_js(&value)
 }
 
-/// Returns the elements as i32s.
 #[wasm_bindgen]
 pub fn core_tensor_i32s(tensor: JsValue) -> Result<Vec<i32>, JsValue> {
     let tensor = hand::tensor_from_js(&tensor)?;
@@ -821,7 +734,6 @@ pub fn core_tensor_i32s(tensor: JsValue) -> Result<Vec<i32>, JsValue> {
     Ok(value.to_vec())
 }
 
-/// Folds a multi-index into its flat index.
 #[wasm_bindgen]
 pub fn core_tensor_index(tensor: JsValue, multi: &[usize]) -> Result<usize, JsValue> {
     let tensor = hand::tensor_from_js(&tensor)?;
@@ -829,7 +741,6 @@ pub fn core_tensor_index(tensor: JsValue, multi: &[usize]) -> Result<usize, JsVa
     Ok(value)
 }
 
-/// Flips every element between zero and one.
 #[wasm_bindgen]
 pub fn core_tensor_invert(tensor: JsValue) -> Result<JsValue, JsValue> {
     let tensor = hand::tensor_from_js(&tensor)?;
@@ -837,7 +748,6 @@ pub fn core_tensor_invert(tensor: JsValue) -> Result<JsValue, JsValue> {
     hand::tensor_to_js(&value)
 }
 
-/// Builds the Kronecker product of the two tensors.
 #[wasm_bindgen]
 pub fn core_tensor_kron(tensor: JsValue, other: JsValue) -> Result<JsValue, JsValue> {
     let tensor = hand::tensor_from_js(&tensor)?;
@@ -846,7 +756,6 @@ pub fn core_tensor_kron(tensor: JsValue, other: JsValue) -> Result<JsValue, JsVa
     hand::tensor_to_js(&value)
 }
 
-/// Numbers every position by its concentric ring out from the center.
 #[wasm_bindgen]
 pub fn core_tensor_layers(tensor: JsValue, dtype: JsValue) -> Result<JsValue, JsValue> {
     let tensor = hand::tensor_from_js(&tensor)?;
@@ -855,7 +764,6 @@ pub fn core_tensor_layers(tensor: JsValue, dtype: JsValue) -> Result<JsValue, Js
     hand::tensor_to_js(&value)
 }
 
-/// Counts each position's masked neighbors holding the target bit.
 #[wasm_bindgen]
 pub fn core_tensor_neighbors(
     tensor: JsValue,
@@ -873,21 +781,18 @@ pub fn core_tensor_neighbors(
     hand::tensor_to_js(&value)
 }
 
-/// Builds a zeroed u8 tensor of the shape.
 #[wasm_bindgen]
 pub fn core_tensor_new(shape: Vec<usize>) -> Result<JsValue, JsValue> {
     let value = mrly_core::Tensor::new(shape);
     hand::tensor_to_js(&value)
 }
 
-/// Wraps a byte vector as a tensor of the shape.
 #[wasm_bindgen]
 pub fn core_tensor_of(data: Vec<u8>, shape: Vec<usize>) -> Result<JsValue, JsValue> {
     let value = mrly_core::Tensor::of(data, shape).map_err(hand::throw)?;
     hand::tensor_to_js(&value)
 }
 
-/// Returns the Otsu threshold splitting the histogram at greatest variance.
 #[wasm_bindgen]
 pub fn core_tensor_otsu_threshold(tensor: JsValue) -> Result<u8, JsValue> {
     let tensor = hand::tensor_from_js(&tensor)?;
@@ -895,7 +800,6 @@ pub fn core_tensor_otsu_threshold(tensor: JsValue) -> Result<u8, JsValue> {
     Ok(value)
 }
 
-/// Wraps the tensor in a count-thick border of one value.
 #[wasm_bindgen]
 pub fn core_tensor_pad(tensor: JsValue, count: usize, value: u8) -> Result<JsValue, JsValue> {
     let tensor = hand::tensor_from_js(&tensor)?;
@@ -903,7 +807,6 @@ pub fn core_tensor_pad(tensor: JsValue, count: usize, value: u8) -> Result<JsVal
     hand::tensor_to_js(&value)
 }
 
-/// Stamps the value wherever the tiled mask is nonzero.
 #[wasm_bindgen]
 pub fn core_tensor_perforate(
     tensor: JsValue,
@@ -916,7 +819,6 @@ pub fn core_tensor_perforate(
     hand::tensor_to_js(&value)
 }
 
-/// Writes the element at a flat index, which must be below the size like a slice index.
 #[wasm_bindgen]
 pub fn core_tensor_put(tensor: JsValue, flat: usize, value: JsValue) -> Result<(), JsValue> {
     let mut tensor_value = hand::tensor_from_js(&tensor)?;
@@ -926,7 +828,6 @@ pub fn core_tensor_put(tensor: JsValue, flat: usize, value: JsValue) -> Result<(
     Ok(())
 }
 
-/// Rotates the tensor k quarter turns in the plane of two axes.
 #[wasm_bindgen]
 pub fn core_tensor_rot90(tensor: JsValue, k: usize, axes: JsValue) -> Result<JsValue, JsValue> {
     let tensor = hand::tensor_from_js(&tensor)?;
@@ -935,7 +836,6 @@ pub fn core_tensor_rot90(tensor: JsValue, k: usize, axes: JsValue) -> Result<JsV
     hand::tensor_to_js(&value)
 }
 
-/// Writes the byte at a multi-index.
 #[wasm_bindgen]
 pub fn core_tensor_set(tensor: JsValue, multi: &[usize], value: u8) -> Result<(), JsValue> {
     let mut tensor_value = hand::tensor_from_js(&tensor)?;
@@ -944,7 +844,6 @@ pub fn core_tensor_set(tensor: JsValue, multi: &[usize], value: u8) -> Result<()
     Ok(())
 }
 
-/// Returns the number of elements.
 #[wasm_bindgen]
 pub fn core_tensor_size(tensor: JsValue) -> Result<usize, JsValue> {
     let tensor = hand::tensor_from_js(&tensor)?;
@@ -952,7 +851,6 @@ pub fn core_tensor_size(tensor: JsValue) -> Result<usize, JsValue> {
     Ok(value)
 }
 
-/// Drops one axis by fixing it at an index.
 #[wasm_bindgen]
 pub fn core_tensor_slice(tensor: JsValue, axis: usize, index: usize) -> Result<JsValue, JsValue> {
     let tensor = hand::tensor_from_js(&tensor)?;
@@ -960,7 +858,6 @@ pub fn core_tensor_slice(tensor: JsValue, axis: usize, index: usize) -> Result<J
     hand::tensor_to_js(&value)
 }
 
-/// Returns the sum of all elements.
 #[wasm_bindgen]
 pub fn core_tensor_sum(tensor: JsValue) -> Result<u64, JsValue> {
     let tensor = hand::tensor_from_js(&tensor)?;
@@ -968,7 +865,6 @@ pub fn core_tensor_sum(tensor: JsValue) -> Result<u64, JsValue> {
     Ok(value)
 }
 
-/// Repeats the tensor the given number of times along each axis.
 #[wasm_bindgen]
 pub fn core_tensor_tile(tensor: JsValue, reps: &[usize]) -> Result<JsValue, JsValue> {
     let tensor = hand::tensor_from_js(&tensor)?;
@@ -976,7 +872,6 @@ pub fn core_tensor_tile(tensor: JsValue, reps: &[usize]) -> Result<JsValue, JsVa
     hand::tensor_to_js(&value)
 }
 
-/// Swaps two axes.
 #[wasm_bindgen]
 pub fn core_tensor_transpose(tensor: JsValue, a: usize, b: usize) -> Result<JsValue, JsValue> {
     let tensor = hand::tensor_from_js(&tensor)?;
@@ -984,7 +879,6 @@ pub fn core_tensor_transpose(tensor: JsValue, a: usize, b: usize) -> Result<JsVa
     hand::tensor_to_js(&value)
 }
 
-/// Builds a zeroed tensor of the shape and width.
 #[wasm_bindgen]
 pub fn core_tensor_typed(shape: Vec<usize>, dtype: JsValue) -> Result<JsValue, JsValue> {
     let dtype = hand::from_js::<mrly_core::Dtype>(&dtype)?;
@@ -992,14 +886,12 @@ pub fn core_tensor_typed(shape: Vec<usize>, dtype: JsValue) -> Result<JsValue, J
     hand::tensor_to_js(&value)
 }
 
-/// Wraps a u16 vector as a tensor of the shape.
 #[wasm_bindgen]
 pub fn core_tensor_u16(data: Vec<u16>, shape: Vec<usize>) -> Result<JsValue, JsValue> {
     let value = mrly_core::Tensor::u16(data, shape).map_err(hand::throw)?;
     hand::tensor_to_js(&value)
 }
 
-/// Returns the elements as u16s.
 #[wasm_bindgen]
 pub fn core_tensor_u16s(tensor: JsValue) -> Result<Vec<u16>, JsValue> {
     let tensor = hand::tensor_from_js(&tensor)?;
@@ -1007,14 +899,12 @@ pub fn core_tensor_u16s(tensor: JsValue) -> Result<Vec<u16>, JsValue> {
     Ok(value.to_vec())
 }
 
-/// Wraps a u32 vector as a tensor of the shape.
 #[wasm_bindgen]
 pub fn core_tensor_u32(data: Vec<u32>, shape: Vec<usize>) -> Result<JsValue, JsValue> {
     let value = mrly_core::Tensor::u32(data, shape).map_err(hand::throw)?;
     hand::tensor_to_js(&value)
 }
 
-/// Returns the elements as u32s.
 #[wasm_bindgen]
 pub fn core_tensor_u32s(tensor: JsValue) -> Result<Vec<u32>, JsValue> {
     let tensor = hand::tensor_from_js(&tensor)?;
@@ -1022,161 +912,138 @@ pub fn core_tensor_u32s(tensor: JsValue) -> Result<Vec<u32>, JsValue> {
     Ok(value.to_vec())
 }
 
-/// Wraps a u8 vector as a tensor of the shape, the same door as `Tensor::of`.
 #[wasm_bindgen]
 pub fn core_tensor_u8(data: Vec<u8>, shape: Vec<usize>) -> Result<JsValue, JsValue> {
     let value = mrly_core::Tensor::u8(data, shape).map_err(hand::throw)?;
     hand::tensor_to_js(&value)
 }
 
-/// The height of an equilateral triangle over its side, the squash a hex rendering wears.
 #[wasm_bindgen]
 pub fn core_HEX_RATIO() -> Result<f64, JsValue> {
     let value = mrly_core::HEX_RATIO;
     Ok(value)
 }
 
-/// The fully transparent color.
 #[wasm_bindgen]
 pub fn core_colors_ALPHA() -> Result<JsValue, JsValue> {
     let value = mrly_core::colors::ALPHA;
     Ok(hand::color_to_js(value))
 }
 
-/// The palette black, #000000.
 #[wasm_bindgen]
 pub fn core_colors_BLACK() -> Result<JsValue, JsValue> {
     let value = mrly_core::colors::BLACK;
     Ok(hand::color_to_js(value))
 }
 
-/// The palette blue, #008cff.
 #[wasm_bindgen]
 pub fn core_colors_BLUE() -> Result<JsValue, JsValue> {
     let value = mrly_core::colors::BLUE;
     Ok(hand::color_to_js(value))
 }
 
-/// The palette brown, #b18462.
 #[wasm_bindgen]
 pub fn core_colors_BROWN() -> Result<JsValue, JsValue> {
     let value = mrly_core::colors::BROWN;
     Ok(hand::color_to_js(value))
 }
 
-/// The palette cyan, #1ec9f3.
 #[wasm_bindgen]
 pub fn core_colors_CYAN() -> Result<JsValue, JsValue> {
     let value = mrly_core::colors::CYAN;
     Ok(hand::color_to_js(value))
 }
 
-/// The dark theme.
 #[wasm_bindgen]
 pub fn core_colors_DARK() -> Result<core_colors_Theme, JsValue> {
     let value = mrly_core::colors::DARK;
     Ok(core_colors_Theme { inner: value })
 }
 
-/// The palette gray, #8e8e93.
 #[wasm_bindgen]
 pub fn core_colors_GRAY() -> Result<JsValue, JsValue> {
     let value = mrly_core::colors::GRAY;
     Ok(hand::color_to_js(value))
 }
 
-/// The palette green, #32cc58.
 #[wasm_bindgen]
 pub fn core_colors_GREEN() -> Result<JsValue, JsValue> {
     let value = mrly_core::colors::GREEN;
     Ok(hand::color_to_js(value))
 }
 
-/// The palette indigo, #6768fa.
 #[wasm_bindgen]
 pub fn core_colors_INDIGO() -> Result<JsValue, JsValue> {
     let value = mrly_core::colors::INDIGO;
     Ok(hand::color_to_js(value))
 }
 
-/// The light theme.
 #[wasm_bindgen]
 pub fn core_colors_LIGHT() -> Result<core_colors_Theme, JsValue> {
     let value = mrly_core::colors::LIGHT;
     Ok(core_colors_Theme { inner: value })
 }
 
-/// The palette mint, #00d1bb.
 #[wasm_bindgen]
 pub fn core_colors_MINT() -> Result<JsValue, JsValue> {
     let value = mrly_core::colors::MINT;
     Ok(hand::color_to_js(value))
 }
 
-/// The fifteen names, in palette order.
 #[wasm_bindgen]
 pub fn core_colors_NAMES() -> Result<JsValue, JsValue> {
     let value = mrly_core::colors::NAMES;
     hand::to_js(&value)
 }
 
-/// The palette orange, #ff8f2c.
 #[wasm_bindgen]
 pub fn core_colors_ORANGE() -> Result<JsValue, JsValue> {
     let value = mrly_core::colors::ORANGE;
     Ok(hand::color_to_js(value))
 }
 
-/// The fifteen colors, in name order.
 #[wasm_bindgen]
 pub fn core_colors_PALETTE() -> Result<JsValue, JsValue> {
     let value = mrly_core::colors::PALETTE;
     hand::list_to_js(&value, |x1| Ok(hand::color_to_js(*x1)))
 }
 
-/// The palette pink, #ff325a.
 #[wasm_bindgen]
 pub fn core_colors_PINK() -> Result<JsValue, JsValue> {
     let value = mrly_core::colors::PINK;
     Ok(hand::color_to_js(value))
 }
 
-/// The palette purple, #d332e9.
 #[wasm_bindgen]
 pub fn core_colors_PURPLE() -> Result<JsValue, JsValue> {
     let value = mrly_core::colors::PURPLE;
     Ok(hand::color_to_js(value))
 }
 
-/// The palette red, #ff3d40.
 #[wasm_bindgen]
 pub fn core_colors_RED() -> Result<JsValue, JsValue> {
     let value = mrly_core::colors::RED;
     Ok(hand::color_to_js(value))
 }
 
-/// The palette teal, #00cad8.
 #[wasm_bindgen]
 pub fn core_colors_TEAL() -> Result<JsValue, JsValue> {
     let value = mrly_core::colors::TEAL;
     Ok(hand::color_to_js(value))
 }
 
-/// The palette white, #ffffff.
 #[wasm_bindgen]
 pub fn core_colors_WHITE() -> Result<JsValue, JsValue> {
     let value = mrly_core::colors::WHITE;
     Ok(hand::color_to_js(value))
 }
 
-/// The palette yellow, #ffd100.
 #[wasm_bindgen]
 pub fn core_colors_YELLOW() -> Result<JsValue, JsValue> {
     let value = mrly_core::colors::YELLOW;
     Ok(hand::color_to_js(value))
 }
 
-/// One theme: the surfaces of a dark or a light ground and the thirteen inks, the same on both.
 #[wasm_bindgen]
 pub struct core_colors_Theme {
     inner: mrly_core::colors::Theme,
@@ -1184,19 +1051,16 @@ pub struct core_colors_Theme {
 
 #[wasm_bindgen]
 impl core_colors_Theme {
-    /// Reads the Theme from its plain data.
     #[wasm_bindgen(js_name = "from")]
     pub fn from_plain(data: JsValue) -> Result<core_colors_Theme, JsValue> {
         Ok(core_colors_Theme {
             inner: hand::from_js(&data)?,
         })
     }
-    /// Writes the Theme as plain data.
     #[wasm_bindgen(js_name = "toJSON")]
     pub fn to_plain(&self) -> Result<JsValue, JsValue> {
         hand::to_js(&self.inner)
     }
-    /// The ground every figure is painted on.
     #[wasm_bindgen(getter)]
     pub fn ground(&self) -> Result<JsValue, JsValue> {
         let value = self.inner.ground;
@@ -1208,7 +1072,6 @@ impl core_colors_Theme {
         self.inner.ground = value;
         Ok(())
     }
-    /// The page background, one step off the ground.
     #[wasm_bindgen(getter)]
     pub fn bg(&self) -> Result<JsValue, JsValue> {
         let value = self.inner.bg;
@@ -1220,7 +1083,6 @@ impl core_colors_Theme {
         self.inner.bg = value;
         Ok(())
     }
-    /// The raised panel.
     #[wasm_bindgen(getter)]
     pub fn panel(&self) -> Result<JsValue, JsValue> {
         let value = self.inner.panel;
@@ -1232,7 +1094,6 @@ impl core_colors_Theme {
         self.inner.panel = value;
         Ok(())
     }
-    /// The sunken well.
     #[wasm_bindgen(getter)]
     pub fn deep(&self) -> Result<JsValue, JsValue> {
         let value = self.inner.deep;
@@ -1244,7 +1105,6 @@ impl core_colors_Theme {
         self.inner.deep = value;
         Ok(())
     }
-    /// The hairline between things.
     #[wasm_bindgen(getter)]
     pub fn line(&self) -> Result<JsValue, JsValue> {
         let value = self.inner.line;
@@ -1256,7 +1116,6 @@ impl core_colors_Theme {
         self.inner.line = value;
         Ok(())
     }
-    /// The foreground, the strongest tone.
     #[wasm_bindgen(getter)]
     pub fn fg(&self) -> Result<JsValue, JsValue> {
         let value = self.inner.fg;
@@ -1268,7 +1127,6 @@ impl core_colors_Theme {
         self.inner.fg = value;
         Ok(())
     }
-    /// The dimmed foreground, for anything secondary.
     #[wasm_bindgen(getter)]
     pub fn dim(&self) -> Result<JsValue, JsValue> {
         let value = self.inner.dim;
@@ -1280,7 +1138,6 @@ impl core_colors_Theme {
         self.inner.dim = value;
         Ok(())
     }
-    /// The interactive accent.
     #[wasm_bindgen(getter)]
     pub fn accent(&self) -> Result<JsValue, JsValue> {
         let value = self.inner.accent;
@@ -1292,7 +1149,6 @@ impl core_colors_Theme {
         self.inner.accent = value;
         Ok(())
     }
-    /// The tone written on the accent.
     #[wasm_bindgen(getter)]
     pub fn on_accent(&self) -> Result<JsValue, JsValue> {
         let value = self.inner.on_accent;
@@ -1304,7 +1160,6 @@ impl core_colors_Theme {
         self.inner.on_accent = value;
         Ok(())
     }
-    /// The red ink.
     #[wasm_bindgen(getter)]
     pub fn red(&self) -> Result<JsValue, JsValue> {
         let value = self.inner.red;
@@ -1316,7 +1171,6 @@ impl core_colors_Theme {
         self.inner.red = value;
         Ok(())
     }
-    /// The orange ink.
     #[wasm_bindgen(getter)]
     pub fn orange(&self) -> Result<JsValue, JsValue> {
         let value = self.inner.orange;
@@ -1328,7 +1182,6 @@ impl core_colors_Theme {
         self.inner.orange = value;
         Ok(())
     }
-    /// The yellow ink.
     #[wasm_bindgen(getter)]
     pub fn yellow(&self) -> Result<JsValue, JsValue> {
         let value = self.inner.yellow;
@@ -1340,7 +1193,6 @@ impl core_colors_Theme {
         self.inner.yellow = value;
         Ok(())
     }
-    /// The green ink.
     #[wasm_bindgen(getter)]
     pub fn green(&self) -> Result<JsValue, JsValue> {
         let value = self.inner.green;
@@ -1352,7 +1204,6 @@ impl core_colors_Theme {
         self.inner.green = value;
         Ok(())
     }
-    /// The mint ink.
     #[wasm_bindgen(getter)]
     pub fn mint(&self) -> Result<JsValue, JsValue> {
         let value = self.inner.mint;
@@ -1364,7 +1215,6 @@ impl core_colors_Theme {
         self.inner.mint = value;
         Ok(())
     }
-    /// The teal ink.
     #[wasm_bindgen(getter)]
     pub fn teal(&self) -> Result<JsValue, JsValue> {
         let value = self.inner.teal;
@@ -1376,7 +1226,6 @@ impl core_colors_Theme {
         self.inner.teal = value;
         Ok(())
     }
-    /// The cyan ink.
     #[wasm_bindgen(getter)]
     pub fn cyan(&self) -> Result<JsValue, JsValue> {
         let value = self.inner.cyan;
@@ -1388,7 +1237,6 @@ impl core_colors_Theme {
         self.inner.cyan = value;
         Ok(())
     }
-    /// The blue ink.
     #[wasm_bindgen(getter)]
     pub fn blue(&self) -> Result<JsValue, JsValue> {
         let value = self.inner.blue;
@@ -1400,7 +1248,6 @@ impl core_colors_Theme {
         self.inner.blue = value;
         Ok(())
     }
-    /// The indigo ink.
     #[wasm_bindgen(getter)]
     pub fn indigo(&self) -> Result<JsValue, JsValue> {
         let value = self.inner.indigo;
@@ -1412,7 +1259,6 @@ impl core_colors_Theme {
         self.inner.indigo = value;
         Ok(())
     }
-    /// The purple ink.
     #[wasm_bindgen(getter)]
     pub fn purple(&self) -> Result<JsValue, JsValue> {
         let value = self.inner.purple;
@@ -1424,7 +1270,6 @@ impl core_colors_Theme {
         self.inner.purple = value;
         Ok(())
     }
-    /// The pink ink.
     #[wasm_bindgen(getter)]
     pub fn pink(&self) -> Result<JsValue, JsValue> {
         let value = self.inner.pink;
@@ -1436,7 +1281,6 @@ impl core_colors_Theme {
         self.inner.pink = value;
         Ok(())
     }
-    /// The brown ink.
     #[wasm_bindgen(getter)]
     pub fn brown(&self) -> Result<JsValue, JsValue> {
         let value = self.inner.brown;
@@ -1448,7 +1292,6 @@ impl core_colors_Theme {
         self.inner.brown = value;
         Ok(())
     }
-    /// The gray ink.
     #[wasm_bindgen(getter)]
     pub fn gray(&self) -> Result<JsValue, JsValue> {
         let value = self.inner.gray;
@@ -1460,19 +1303,16 @@ impl core_colors_Theme {
         self.inner.gray = value;
         Ok(())
     }
-    /// The thirteen inks in name order.
     pub fn hues(&self) -> Result<JsValue, JsValue> {
         let value = self.inner.hues();
         hand::list_to_js(&value, |x1| Ok(hand::color_to_js(*x1)))
     }
-    /// The six inks a figure cycles through: blue, orange, yellow, green, pink, indigo.
     pub fn inks(&self) -> Result<JsValue, JsValue> {
         let value = self.inner.inks();
         hand::list_to_js(&value, |x1| Ok(hand::color_to_js(*x1)))
     }
 }
 
-/// A complete coloring recipe for one cell.
 #[wasm_bindgen]
 pub struct core_paint_Paint {
     inner: mrly_core::paint::Paint,
@@ -1480,19 +1320,16 @@ pub struct core_paint_Paint {
 
 #[wasm_bindgen]
 impl core_paint_Paint {
-    /// Reads the Paint from its plain data.
     #[wasm_bindgen(js_name = "from")]
     pub fn from_plain(data: JsValue) -> Result<core_paint_Paint, JsValue> {
         Ok(core_paint_Paint {
             inner: hand::from_js(&data)?,
         })
     }
-    /// Writes the Paint as plain data.
     #[wasm_bindgen(js_name = "toJSON")]
     pub fn to_plain(&self) -> Result<JsValue, JsValue> {
         hand::to_js(&self.inner)
     }
-    /// The coloring edition.
     #[wasm_bindgen(getter)]
     pub fn edition(&self) -> Result<JsValue, JsValue> {
         let value = self.inner.edition;
@@ -1504,7 +1341,6 @@ impl core_paint_Paint {
         self.inner.edition = value;
         Ok(())
     }
-    /// The secondary color scheme.
     #[wasm_bindgen(getter)]
     pub fn scheme(&self) -> Result<JsValue, JsValue> {
         let value = self.inner.scheme;
@@ -1516,7 +1352,6 @@ impl core_paint_Paint {
         self.inner.scheme = value;
         Ok(())
     }
-    /// The side the primary ink lands on.
     #[wasm_bindgen(getter)]
     pub fn target(&self) -> Result<JsValue, JsValue> {
         let value = self.inner.target;
@@ -1528,7 +1363,6 @@ impl core_paint_Paint {
         self.inner.target = value;
         Ok(())
     }
-    /// The primary ink.
     #[wasm_bindgen(getter)]
     pub fn primary(&self) -> Result<JsValue, JsValue> {
         let value = self.inner.primary;
@@ -1540,7 +1374,6 @@ impl core_paint_Paint {
         self.inner.primary = value;
         Ok(())
     }
-    /// The secondary inks.
     #[wasm_bindgen(getter)]
     pub fn secondary(&self) -> Result<JsValue, JsValue> {
         let value = self.inner.secondary.clone();
@@ -1552,7 +1385,6 @@ impl core_paint_Paint {
         self.inner.secondary = value;
         Ok(())
     }
-    /// The shade indices of a multitone ramp.
     #[wasm_bindgen(getter)]
     pub fn shades(&self) -> Result<Vec<usize>, JsValue> {
         let value = self.inner.shades.clone();
@@ -1563,12 +1395,10 @@ impl core_paint_Paint {
         self.inner.shades = value;
         Ok(())
     }
-    /// Returns true for the Simple edition.
     pub fn is_simple(&self) -> Result<bool, JsValue> {
         let value = self.inner.is_simple();
         Ok(value)
     }
-    /// Builds a black-primary, fill-target, multicolor paint for an edition.
     #[wasm_bindgen(constructor)]
     pub fn new(edition: JsValue) -> Result<core_paint_Paint, JsValue> {
         let edition = hand::from_js::<mrly_core::paint::Edition>(&edition)?;
@@ -1577,29 +1407,24 @@ impl core_paint_Paint {
     }
 }
 
-/// A rule that turns counter values into colors.
 #[wasm_bindgen]
 pub struct core_Colorizer {}
 
 #[wasm_bindgen]
 impl core_Colorizer {
-    /// Returns the default Colorizer.
     #[wasm_bindgen(js_name = "default")]
     pub fn default_() -> Result<JsValue, JsValue> {
         let value = mrly_core::Colorizer::default();
         hand::to_js(&value)
     }
-    /// Builds the blue-to-red diverging ramp around a white middle.
     pub fn diverge() -> Result<JsValue, JsValue> {
         let value = mrly_core::Colorizer::diverge();
         hand::to_js(&value)
     }
-    /// Builds the black-through-ember fire ramp: black, dark red, orange, light yellow.
     pub fn fire() -> Result<JsValue, JsValue> {
         let value = mrly_core::Colorizer::fire();
         hand::to_js(&value)
     }
-    /// Builds a binned colorizer from a gradient through the given stops.
     pub fn gradient_bins(
         background: JsValue,
         colors: JsValue,
@@ -1611,20 +1436,17 @@ impl core_Colorizer {
             .map_err(hand::throw)?;
         hand::to_js(&value)
     }
-    /// Builds the white-to-black heat ramp.
     pub fn heat() -> Result<JsValue, JsValue> {
         let value = mrly_core::Colorizer::heat();
         hand::to_js(&value)
     }
 }
 
-/// The element widths a tensor can hold.
 #[wasm_bindgen]
 pub struct core_Dtype {}
 
 #[wasm_bindgen]
 impl core_Dtype {
-    /// Returns the largest value the width can hold.
     pub fn max(dtype: JsValue) -> Result<i64, JsValue> {
         let dtype = hand::from_js::<mrly_core::Dtype>(&dtype)?;
         let value = dtype.max();
@@ -1632,13 +1454,11 @@ impl core_Dtype {
     }
 }
 
-/// The constraints a caller may put on a random paint.
 #[wasm_bindgen]
 pub struct core_paint_Config {}
 
 #[wasm_bindgen]
 impl core_paint_Config {
-    /// Returns the default Config.
     #[wasm_bindgen(js_name = "default")]
     pub fn default_() -> Result<JsValue, JsValue> {
         let value = mrly_core::paint::Config::default();
@@ -1646,18 +1466,15 @@ impl core_paint_Config {
     }
 }
 
-/// The seven ways a paint distributes its colors over a cell.
 #[wasm_bindgen]
 pub struct core_paint_Edition {}
 
 #[wasm_bindgen]
 impl core_paint_Edition {
-    /// Returns every Edition in canonical order.
     pub fn all() -> Result<JsValue, JsValue> {
         let value = mrly_core::paint::Edition::all();
         hand::to_js(&value)
     }
-    /// Returns the cell-painting mode this edition renders with, or None for Random, which scatters.
     pub fn mode(edition: JsValue) -> Result<JsValue, JsValue> {
         let edition = hand::from_js::<mrly_core::paint::Edition>(&edition)?;
         let value = edition.mode();
@@ -1665,18 +1482,15 @@ impl core_paint_Edition {
     }
 }
 
-/// The fifteen named inks a paint draws from.
 #[wasm_bindgen]
 pub struct core_paint_Ink {}
 
 #[wasm_bindgen]
 impl core_paint_Ink {
-    /// Returns every Ink in canonical order.
     pub fn all() -> Result<JsValue, JsValue> {
         let value = mrly_core::paint::Ink::all();
         hand::to_js(&value)
     }
-    /// Returns the ink's color.
     pub fn color(ink: JsValue) -> Result<JsValue, JsValue> {
         let ink = hand::from_js::<mrly_core::paint::Ink>(&ink)?;
         let value = ink.color();
@@ -1684,26 +1498,22 @@ impl core_paint_Ink {
     }
 }
 
-/// The two ways secondary colors are drawn.
 #[wasm_bindgen]
 pub struct core_paint_Scheme {}
 
 #[wasm_bindgen]
 impl core_paint_Scheme {
-    /// Returns every Scheme in canonical order.
     pub fn all() -> Result<JsValue, JsValue> {
         let value = mrly_core::paint::Scheme::all();
         hand::to_js(&value)
     }
 }
 
-/// The side of the figure the primary ink lands on.
 #[wasm_bindgen]
 pub struct core_paint_Target {}
 
 #[wasm_bindgen]
 impl core_paint_Target {
-    /// Returns every Target in canonical order.
     pub fn all() -> Result<JsValue, JsValue> {
         let value = mrly_core::paint::Target::all();
         hand::to_js(&value)

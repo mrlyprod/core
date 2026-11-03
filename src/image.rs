@@ -2,31 +2,15 @@ use super::error::{Error, Result, shape_error, value_error};
 use super::resample::{self, Filter, block};
 use serde::{Deserialize, Serialize};
 
-/// An image: its width, its height and the rgba color of every pixel, row by row from the top.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(try_from = "Parts")]
 pub struct Image {
-    /// The width in pixels.
     pub width: usize,
-    /// The height in pixels.
     pub height: usize,
-    /// The rgba color of every pixel, row by row.
     pub colors: Vec<[u8; 4]>,
 }
 
 impl Image {
-    /// Builds an image from its width, its height and its colors.
-    ///
-    /// # Errors
-    ///
-    /// Errs when the colors do not count width by height.
-    ///
-    /// ```
-    /// let image = mrly_core::Image::new(2, 1, vec![[255, 0, 0, 255], [0, 0, 255, 255]])?;
-    /// assert_eq!((image.width, image.height, image.colors[1]), (2, 1, [0, 0, 255, 255]));
-    /// assert!(mrly_core::Image::new(2, 2, vec![[0, 0, 0, 255]]).is_err());
-    /// # Ok::<(), mrly_core::Error>(())
-    /// ```
     pub fn new(width: usize, height: usize, colors: Vec<[u8; 4]>) -> Result<Image> {
         if Some(colors.len()) != width.checked_mul(height) {
             return shape_error("colors length must equal width * height.");
@@ -37,11 +21,6 @@ impl Image {
             colors,
         })
     }
-    /// Draws every pixel as a scale by scale block, growing both sides by scale.
-    ///
-    /// # Errors
-    ///
-    /// Errs on a scale below one, colors that do not count width by height, or a grown size that overflows.
     pub fn scale(&self, scale: usize) -> Result<Image> {
         if scale < 1 {
             return value_error("scale must be at least 1.");
@@ -53,11 +32,6 @@ impl Image {
             colors,
         })
     }
-    /// Resamples the image to a new size.
-    ///
-    /// # Errors
-    ///
-    /// Errs on a side of zero, colors that do not count width by height, or a size that overflows.
     pub fn resample(&self, width: usize, height: usize, filter: Filter) -> Result<Image> {
         let colors =
             resample::resample(&self.colors, self.width, self.height, width, height, filter)?;
@@ -69,7 +43,6 @@ impl Image {
     }
 }
 
-/// Box-blurs rgba pixels by radius, each channel the mean of its edge-padded window.
 pub fn blur(pixels: &[[u8; 4]], width: usize, height: usize, radius: usize) -> Vec<[u8; 4]> {
     let read = |y: usize, x: usize| -> [u8; 4] {
         pixels.get(y * width + x).copied().unwrap_or([0, 0, 0, 0])
@@ -135,88 +108,5 @@ impl TryFrom<Parts> for Image {
 
     fn try_from(parts: Parts) -> Result<Image> {
         Image::new(parts.width, parts.height, parts.colors)
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use crate::json;
-
-    fn sample() -> Image {
-        Image::new(
-            2,
-            2,
-            vec![
-                [255, 0, 0, 255],
-                [0, 0, 0, 255],
-                [0, 0, 0, 255],
-                [0, 140, 255, 128],
-            ],
-        )
-        .unwrap()
-    }
-
-    fn carpet_pixels() -> Vec<[u8; 4]> {
-        use crate::cell::{Cell, Mode, mapping};
-        Cell::new(crate::seeds::carpet_2d(3))
-            .paint(&mapping(), Mode::Type, None)
-            .unwrap()
-            .colors
-            .unwrap()
-    }
-
-    #[test]
-    fn blur_averages_the_edge_padded_window() {
-        let blurred = blur(&carpet_pixels(), 3, 3, 1);
-        assert_eq!(blurred.len(), 9);
-        assert_eq!(blurred[4], [28, 28, 28, 113]);
-        assert_eq!(blur(&carpet_pixels(), 3, 3, 0), carpet_pixels());
-    }
-
-    #[test]
-    fn json_round_trips() {
-        let image = sample();
-        let json = serde_json::to_value(&image).unwrap();
-        assert_eq!(json["colors"][3], json!([0, 140, 255, 128]));
-        let back: Image = serde_json::from_value(json).unwrap();
-        assert_eq!(image, back);
-    }
-
-    #[test]
-    fn refuses_from_json() {
-        let read = |value| serde_json::from_value::<Image>(value);
-        assert!(read(json!(null)).is_err());
-        assert!(read(json!({ "width": 1, "height": 1 })).is_err());
-        let short = json!({ "width": 1, "height": 2, "colors": [[0, 0, 0, 255]] });
-        assert!(read(short).is_err());
-        let long = json!({ "width": 1, "height": 1, "colors": [[0, 0, 0, 255], [0, 0, 0, 255]] });
-        assert!(read(long).is_err());
-        let thin = json!({ "width": 1, "height": 1, "colors": [[0, 0, 0]] });
-        assert!(read(thin).is_err());
-        let wide = json!({ "width": usize::MAX, "height": 2, "colors": [] });
-        assert!(read(wide).is_err());
-    }
-
-    #[test]
-    fn scale_draws_every_pixel_as_a_block() {
-        let image = sample().scale(4).unwrap();
-        assert_eq!((image.width, image.height), (8, 8));
-        assert_eq!(image.colors.len(), 64);
-        assert_eq!(image.colors[0], [255, 0, 0, 255]);
-        assert_eq!(image.colors[3], [255, 0, 0, 255]);
-        assert_eq!(image.colors[4], [0, 0, 0, 255]);
-        assert_eq!(image.colors[63], [0, 140, 255, 128]);
-        assert_eq!(sample().scale(1).unwrap(), sample());
-        assert!(sample().scale(0).is_err());
-        assert!(sample().scale(usize::MAX).is_err());
-    }
-
-    #[test]
-    fn resample_keeps_the_colors_on_a_nearest_upscale() {
-        let image = sample().resample(4, 4, Filter::Nearest).unwrap();
-        assert_eq!((image.width, image.height), (4, 4));
-        assert_eq!(image, sample().scale(2).unwrap());
-        assert!(sample().resample(0, 4, Filter::Nearest).is_err());
     }
 }

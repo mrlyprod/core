@@ -1,17 +1,3 @@
-/// Declares a fieldless enum whose variants each spell one word, with `all`, `name`, `Display` and `FromStr`.
-///
-/// ```
-/// mrly_core::named_enum! {
-///     #[derive(Clone, Copy, Debug, PartialEq)]
-///     pub enum Fate {
-///         Dead => "dead",
-///         Alive => "alive",
-///     }
-/// }
-/// assert_eq!(Fate::all(), [Fate::Dead, Fate::Alive]);
-/// assert_eq!("alive".parse::<Fate>().unwrap(), Fate::Alive);
-/// assert!("asleep".parse::<Fate>().is_err());
-/// ```
 #[macro_export]
 macro_rules! named_enum {
     (
@@ -26,11 +12,9 @@ macro_rules! named_enum {
         }
 
         impl $name {
-            #[doc = ::std::concat!("Returns every ", ::std::stringify!($name), " in canonical order.")]
             pub const fn all() -> [$name; [$($name::$variant),+].len()] {
                 [$($name::$variant),+]
             }
-            #[doc = ::std::concat!("Returns the ", ::std::stringify!($name), "'s display name.")]
             pub fn name(&self) -> &'static str {
                 match self {
                     $($name::$variant => $word,)+

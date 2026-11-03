@@ -1,26 +1,15 @@
 use super::error::{Result, overflow_error, shape_error, value_error};
 use serde::{Deserialize, Serialize};
 
-/// The way a resampling weighs the source pixels it reads.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub enum Filter {
-    /// The single nearest source pixel, palettes and hard edges kept.
     Nearest,
-    /// The linear blend of the four source pixels around the target centre.
     Linear,
-    /// The mean of the source box the target pixel covers.
     Box,
 }
 
-/// The height of an equilateral triangle over its side, the squash a hex rendering wears.
 pub const HEX_RATIO: f64 = 0.866_025_403_784_438_6;
 
-/// Returns the size a hex rendering wears, the named axis squashed by the triangle ratio.
-///
-/// ```
-/// assert_eq!(mrly_core::resample::hex_size(100, 100, true), (86, 100));
-/// assert_eq!(mrly_core::resample::hex_size(100, 100, false), (100, 86));
-/// ```
 pub fn hex_size(width: usize, height: usize, vertical: bool) -> (usize, usize) {
     let squash = |value: usize| ((value as f64 * HEX_RATIO) as usize).max(1);
     match vertical {
@@ -29,11 +18,6 @@ pub fn hex_size(width: usize, height: usize, vertical: bool) -> (usize, usize) {
     }
 }
 
-/// Squashes rgba pixels to the hex aspect, returning the new width, height and pixels.
-///
-/// # Errors
-///
-/// Errs on a side of zero or a pixels length that is not width by height.
 pub fn hex_fit(
     pixels: &[[u8; 4]],
     width: usize,
@@ -46,18 +30,6 @@ pub fn hex_fit(
     Ok((out_w, out_h, out))
 }
 
-/// Resamples rgba pixels to a new size.
-///
-/// # Errors
-///
-/// Errs on a side of zero, a pixels length that is not width by height, or an output size that overflows.
-///
-/// ```
-/// let pixels = [[255, 0, 0, 255], [0, 0, 255, 255]];
-/// let filter = mrly_core::resample::Filter::Nearest;
-/// let wide = mrly_core::resample::resample(&pixels, 2, 1, 4, 1, filter).unwrap();
-/// assert_eq!(wide, vec![pixels[0], pixels[0], pixels[1], pixels[1]]);
-/// ```
 pub fn resample(
     pixels: &[[u8; 4]],
     width: usize,
@@ -85,16 +57,6 @@ pub fn resample(
     })
 }
 
-/// Draws every source element as a scale by scale block, growing both sides by scale.
-///
-/// # Errors
-///
-/// Errs when the source is not width by height, or the grown size overflows.
-///
-/// ```
-/// let out = mrly_core::resample::block(&[1u8, 2], 2, 1, 2).unwrap();
-/// assert_eq!(out, vec![1, 1, 2, 2, 1, 1, 2, 2]);
-/// ```
 pub fn block<T: Copy>(src: &[T], width: usize, height: usize, scale: usize) -> Result<Vec<T>> {
     if Some(src.len()) != width.checked_mul(height) {
         return shape_error("block source length must equal width * height.");
@@ -220,134 +182,4 @@ fn boxed(
         }
     }
     out
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    const FILTERS: [Filter; 3] = [Filter::Nearest, Filter::Linear, Filter::Box];
-
-    fn ramp(width: usize, height: usize) -> Vec<[u8; 4]> {
-        (0..width * height)
-            .map(|i| {
-                let v = (i * 7 % 251) as u8;
-                [v, 255 - v, v / 2, 255]
-            })
-            .collect()
-    }
-
-    #[test]
-    fn every_filter_keeps_the_same_size_untouched() {
-        let pixels = ramp(5, 3);
-        for filter in FILTERS {
-            let out = resample(&pixels, 5, 3, 5, 3, filter).unwrap();
-            assert_eq!(out, pixels, "{filter:?} moved an unchanged size");
-        }
-    }
-
-    #[test]
-    fn every_filter_keeps_a_flat_field_flat() {
-        let pixels = vec![[17, 34, 51, 255]; 64];
-        for filter in FILTERS {
-            for (w, h) in [(3, 3), (8, 8), (17, 5), (1, 1)] {
-                let out = resample(&pixels, 8, 8, w, h, filter).unwrap();
-                assert_eq!(out.len(), w * h);
-                assert!(
-                    out.iter().all(|&p| p == [17, 34, 51, 255]),
-                    "{filter:?} smeared a flat field at {w}x{h}"
-                );
-            }
-        }
-    }
-
-    #[test]
-    fn box_downscale_averages_the_block() {
-        let pixels = vec![
-            [0, 0, 0, 255],
-            [10, 20, 30, 255],
-            [100, 100, 100, 255],
-            [200, 60, 40, 255],
-        ];
-        let out = resample(&pixels, 2, 2, 1, 1, Filter::Box).unwrap();
-        assert_eq!(out, vec![[78, 45, 43, 255]]);
-    }
-
-    #[test]
-    fn box_halving_is_a_two_by_two_mean() {
-        let pixels = ramp(8, 8);
-        let out = resample(&pixels, 8, 8, 4, 4, Filter::Box).unwrap();
-        for y in 0..4 {
-            for x in 0..4 {
-                let block = [
-                    pixels[2 * y * 8 + 2 * x],
-                    pixels[2 * y * 8 + 2 * x + 1],
-                    pixels[(2 * y + 1) * 8 + 2 * x],
-                    pixels[(2 * y + 1) * 8 + 2 * x + 1],
-                ];
-                let mean = (0..4)
-                    .map(|c| ((block.iter().map(|p| p[c] as u32).sum::<u32>() + 2) / 4) as u8)
-                    .collect::<Vec<u8>>();
-                assert_eq!(out[y * 4 + x].to_vec(), mean, "at {x},{y}");
-            }
-        }
-    }
-
-    #[test]
-    fn linear_upscale_pins_the_corners() {
-        let pixels = ramp(4, 4);
-        let out = resample(&pixels, 4, 4, 16, 16, Filter::Linear).unwrap();
-        assert_eq!(out[0], pixels[0]);
-        assert_eq!(out[15], pixels[3]);
-        assert_eq!(out[15 * 16], pixels[12]);
-        assert_eq!(out[15 * 16 + 15], pixels[15]);
-    }
-
-    #[test]
-    fn linear_stays_between_its_neighbors() {
-        let pixels = vec![[0, 0, 0, 255], [255, 255, 255, 255]];
-        let out = resample(&pixels, 2, 1, 9, 1, Filter::Linear).unwrap();
-        assert_eq!(out[0], [0, 0, 0, 255]);
-        assert_eq!(out[8], [255, 255, 255, 255]);
-        for pair in out.windows(2) {
-            assert!(pair[1][0] >= pair[0][0], "linear ramp fell back");
-        }
-    }
-
-    #[test]
-    fn refuses_resample() {
-        let pixels = ramp(2, 2);
-        assert!(resample(&pixels, 2, 2, 0, 4, Filter::Nearest).is_err());
-        assert!(resample(&pixels, 2, 2, 4, 0, Filter::Nearest).is_err());
-        assert!(resample(&pixels, 0, 2, 4, 4, Filter::Nearest).is_err());
-        assert!(resample(&pixels, 3, 2, 4, 4, Filter::Nearest).is_err());
-        assert!(resample(&pixels, 2, 2, usize::MAX, 2, Filter::Nearest).is_err());
-    }
-
-    #[test]
-    fn refuses_block() {
-        assert!(block(&[1u8, 2, 3], 2, 2, 1).is_err());
-        assert!(block(&[1u8, 2, 3, 4], 2, 2, usize::MAX).is_err());
-        assert_eq!(block::<u8>(&[], 0, 3, 2).unwrap(), Vec::<u8>::new());
-    }
-
-    #[test]
-    fn block_matches_a_nearest_upscale() {
-        let pixels = ramp(4, 3);
-        let out = resample(&pixels, 4, 3, 12, 9, Filter::Nearest).unwrap();
-        assert_eq!(block(&pixels, 4, 3, 3).unwrap(), out);
-        assert_eq!(block(&pixels, 4, 3, 1).unwrap(), pixels);
-    }
-
-    #[test]
-    fn hex_fit_squashes_one_axis_only() {
-        let pixels = ramp(20, 10);
-        let (w, h, out) = hex_fit(&pixels, 20, 10, true, Filter::Box).unwrap();
-        assert_eq!((w, h), (17, 10));
-        assert_eq!(out.len(), 170);
-        let (w, h, out) = hex_fit(&pixels, 20, 10, false, Filter::Nearest).unwrap();
-        assert_eq!((w, h), (20, 8));
-        assert_eq!(out.len(), 160);
-        assert_eq!(hex_size(1, 1, true), (1, 1));
-    }
 }

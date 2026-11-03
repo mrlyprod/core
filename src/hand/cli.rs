@@ -1,11 +1,7 @@
-#![allow(missing_docs)]
-
 pub use serde_json::{self, Value};
 use std::fmt;
 use std::io::{self, IsTerminal, Read, Write};
 use std::process::ExitCode;
-
-// PLUMBING
 
 pub type Done = Result<Value, Error>;
 
@@ -73,8 +69,6 @@ impl fmt::Display for Error {
 }
 
 impl std::error::Error for Error {}
-
-// BOOK
 
 #[derive(Clone, Copy)]
 pub struct Book {
@@ -148,8 +142,6 @@ fn distance(a: &str, b: &str) -> usize {
     }
     row[b.len()]
 }
-
-// READING
 
 pub fn usage(what: String) -> Error {
     Error::Usage(what)
@@ -263,8 +255,6 @@ pub fn cells_rank(name: &str, args: &[Value], at: usize) -> Result<usize, Error>
         .ok_or_else(|| bad(name, at, "a list of Cell2d or Cell3d"))
 }
 
-// WRITING
-
 pub fn tint(color: crate::Color) -> Value {
     Value::Array(vec![
         color.r.into(),
@@ -273,8 +263,6 @@ pub fn tint(color: crate::Color) -> Value {
         color.a.into(),
     ])
 }
-
-// COMMAND
 
 const HELP: &str = r#"BIN: every public function of its crate from the shell, JSON in, JSON out.
 

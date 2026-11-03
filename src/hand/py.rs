@@ -1,5 +1,3 @@
-#![allow(missing_docs)]
-
 use crate::cell::Cell;
 use crate::colors::Color;
 use crate::error::{Error, Result};
@@ -16,8 +14,6 @@ use pythonize::{depythonize, pythonize};
 use serde::Serialize;
 use serde::de::DeserializeOwned;
 
-// ERRORS
-
 pub fn py_error(error: Error) -> PyErr {
     match error {
         Error::Overflow(message) => PyOverflowError::new_err(message),
@@ -32,8 +28,6 @@ pub fn ok<T>(result: Result<T>) -> PyResult<T> {
 pub fn bad(message: impl Into<String>) -> PyErr {
     PyValueError::new_err(message.into())
 }
-
-// TENSOR
 
 pub struct PyTensor(pub Tensor);
 
@@ -126,8 +120,6 @@ impl<'py> FromPyObject<'_, 'py> for PyTensor {
         Ok(PyTensor(tensor_from_py(&obj)?))
     }
 }
-
-// CELL
 
 pub struct PyCell(pub Cell);
 
@@ -248,8 +240,6 @@ impl<'py> FromPyObject<'_, 'py> for PyCell {
     }
 }
 
-// IMAGE
-
 pub struct PyImage(pub Image);
 
 impl<'py> IntoPyObject<'py> for PyImage {
@@ -288,8 +278,6 @@ impl<'py> FromPyObject<'_, 'py> for PyImage {
     }
 }
 
-// COLOR
-
 pub struct PyColor(pub Color);
 
 impl<'py> IntoPyObject<'py> for PyColor {
@@ -311,8 +299,6 @@ impl<'py> FromPyObject<'_, 'py> for PyColor {
         Ok(PyColor(Color::rgba(r, g, b, a)))
     }
 }
-
-// PIXELS
 
 pub struct PyRgba(pub [u8; 4]);
 
@@ -372,8 +358,6 @@ impl<'py> FromPyObject<'_, 'py> for PyPixels {
     }
 }
 
-// SERDE
-
 pub struct PySerde<T>(pub T);
 
 pub fn serde_into_py<'py, T: Serialize + ?Sized>(
@@ -413,50 +397,38 @@ impl<'py, T: DeserializeOwned> FromPyObject<'_, 'py> for PySerde<T> {
     }
 }
 
-// RNG
-
-/// The seeded random stream, one class, passed wherever Rust takes a mutable stream.
 #[pyclass(name = "Rng", module = "mrly.core")]
 pub struct PyRng(pub Rng);
 
 #[pymethods]
 impl PyRng {
-    /// Opens the stream of the seed.
     #[new]
     pub fn new(seed: u64) -> PyRng {
         PyRng(Rng::new(seed))
     }
-    /// Draws a float at or above zero and below one.
     pub fn unit(&mut self) -> f64 {
         self.0.unit()
     }
-    /// Draws an integer below n, or zero when n is zero.
     pub fn below(&mut self, n: usize) -> usize {
         self.0.below(n)
     }
-    /// Draws an integer between lo and hi inclusive.
     pub fn range(&mut self, lo: i64, hi: i64) -> i64 {
         self.0.range(lo, hi)
     }
-    /// Draws a fair coin flip.
     pub fn boolean(&mut self) -> bool {
         self.0.boolean()
     }
-    /// Returns true with probability p.
     pub fn chance(&mut self, p: f64) -> bool {
         self.0.chance(p)
     }
-    /// Draws amount distinct indices below length.
     pub fn sample_indices(&mut self, length: usize, amount: usize) -> Vec<usize> {
         self.0.sample_indices(length, amount)
     }
-    /// Draws one item of the sequence, the same draw as Rust's choice.
     pub fn choice<'py>(&mut self, seq: &Bound<'py, PyAny>) -> PyResult<Bound<'py, PyAny>> {
         let indices: Vec<usize> = (0..seq.len()?).collect();
         let index = *ok(self.0.choice(&indices))?;
         seq.get_item(index)
     }
-    /// Shuffles the list in place, the same permutation as Rust's shuffle.
     pub fn shuffle(&mut self, seq: &Bound<'_, PyList>) -> PyResult<()> {
         let mut order: Vec<usize> = (0..seq.len()).collect();
         self.0.shuffle(&mut order);
@@ -469,11 +441,9 @@ impl PyRng {
         }
         Ok(())
     }
-    /// Returns the stream's state as text, the way a stream crosses into another unit.
     pub fn state(&self) -> PyResult<String> {
         serde_json::to_string(&self.0).map_err(|error| bad(error.to_string()))
     }
-    /// Reads a state back into the stream, the way a stream crosses back out of another unit.
     pub fn restore(&mut self, state: &str) -> PyResult<()> {
         self.0 = serde_json::from_str(state).map_err(|error| bad(error.to_string()))?;
         Ok(())

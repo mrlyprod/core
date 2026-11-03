@@ -3,21 +3,18 @@
 use pyo3::prelude::*;
 use pyo3::types::PyDict;
 
-/// The substrate: tensors, cells, colors, images, resampling, seeded chance and the canonical names.
 pub mod core {
     use crate::hand::{PyColor, PyPixels, PyRng, PySerde, ok};
     use pyo3::IntoPyObjectExt;
     use pyo3::prelude::*;
     use pyo3::types::PyDict;
 
-    /// The cell grid: type bytes with optional per-cell colors and tags.
     pub mod cell {
         use crate::hand::{PyCell, PyColor, PyRgba, PyRng, PySerde, PyTensor, ok};
         use pyo3::IntoPyObjectExt;
         use pyo3::prelude::*;
         use pyo3::types::PyDict;
 
-        /// Flips every type to one minus itself, same as invert.
         #[pyfunction]
         #[pyo3(name = "anti", signature = (cell))]
         pub fn anti<'py>(py: Python<'py>, cell: PyCell) -> PyResult<Bound<'py, PyAny>> {
@@ -26,7 +23,6 @@ pub mod core {
             (PyCell(out)).into_bound_py_any(py)
         }
 
-        /// Maps every type to one at or above the threshold and zero below, dropping colors.
         #[pyfunction]
         #[pyo3(name = "binarize", signature = (cell, threshold))]
         pub fn binarize<'py>(
@@ -39,7 +35,6 @@ pub mod core {
             (PyCell(out)).into_bound_py_any(py)
         }
 
-        /// Binarizes the types at Otsu's threshold, dropping colors.
         #[pyfunction]
         #[pyo3(name = "binarize_otsu", signature = (cell))]
         pub fn binarize_otsu<'py>(py: Python<'py>, cell: PyCell) -> PyResult<Bound<'py, PyAny>> {
@@ -48,7 +43,6 @@ pub mod core {
             (PyCell(out)).into_bound_py_any(py)
         }
 
-        /// Replaces every type with the rounded mean of its masked neighborhood, dropping colors.
         #[pyfunction]
         #[pyo3(name = "blur", signature = (cell, mask, wrap))]
         pub fn blur<'py>(
@@ -63,7 +57,6 @@ pub mod core {
             (PyCell(ok(out)?)).into_bound_py_any(py)
         }
 
-        /// Returns the painted color at a flat index, or transparent while unpainted or past the end.
         #[pyfunction]
         #[pyo3(name = "color_at", signature = (cell, flat))]
         pub fn color_at<'py>(
@@ -76,7 +69,6 @@ pub mod core {
             (PyRgba(out)).into_bound_py_any(py)
         }
 
-        /// Builds the Kronecker product of the two cells' types.
         #[pyfunction]
         #[pyo3(name = "combine", signature = (cell, other))]
         pub fn combine<'py>(
@@ -90,7 +82,6 @@ pub mod core {
             (PyCell(out)).into_bound_py_any(py)
         }
 
-        /// Grows the types to the level-fold Kronecker power of themselves, dropping colors and tags.
         #[pyfunction]
         #[pyo3(name = "fractal", signature = (cell, level))]
         pub fn fractal<'py>(
@@ -103,7 +94,6 @@ pub mod core {
             (PyCell(ok(out)?)).into_bound_py_any(py)
         }
 
-        /// Flips every type to one minus itself.
         #[pyfunction]
         #[pyo3(name = "invert", signature = (cell))]
         pub fn invert<'py>(py: Python<'py>, cell: PyCell) -> PyResult<Bound<'py, PyAny>> {
@@ -112,7 +102,6 @@ pub mod core {
             (PyCell(out)).into_bound_py_any(py)
         }
 
-        /// Tags every cell with its concentric shell distance from the center.
         #[pyfunction]
         #[pyo3(name = "layers", signature = (cell, dtype))]
         pub fn layers<'py>(
@@ -126,7 +115,6 @@ pub mod core {
             (PyCell(out)).into_bound_py_any(py)
         }
 
-        /// Folds at least two cells into one by chained Kronecker products.
         #[pyfunction]
         #[pyo3(name = "magic", signature = (cells))]
         pub fn magic<'py>(py: Python<'py>, cells: Vec<PyCell>) -> PyResult<Bound<'py, PyAny>> {
@@ -135,7 +123,6 @@ pub mod core {
             (PyCell(ok(out)?)).into_bound_py_any(py)
         }
 
-        /// Returns the default mapping of the first six types to white, black, alpha, red, green, and blue.
         #[pyfunction]
         #[pyo3(name = "mapping", signature = ())]
         pub fn mapping<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
@@ -147,7 +134,6 @@ pub mod core {
             .into_bound_py_any(py)
         }
 
-        /// Stitches same-shaped cells into one grid of reps blocks per axis.
         #[pyfunction]
         #[pyo3(name = "merge", signature = (cells, reps))]
         pub fn merge<'py>(
@@ -160,7 +146,6 @@ pub mod core {
             (PyCell(ok(out)?)).into_bound_py_any(py)
         }
 
-        /// Builds the 3-wide Moore mask of the dimension, every site on but the center.
         #[pyfunction]
         #[pyo3(name = "moore", signature = (dimension))]
         pub fn moore<'py>(py: Python<'py>, dimension: usize) -> PyResult<Bound<'py, PyAny>> {
@@ -168,7 +153,6 @@ pub mod core {
             (PyTensor(out)).into_bound_py_any(py)
         }
 
-        /// Lays the cell each mask entry indexes into that entry's place and merges the lot.
         #[pyfunction]
         #[pyo3(name = "mosaic", signature = (mask, cells))]
         pub fn mosaic<'py>(
@@ -182,7 +166,6 @@ pub mod core {
             (PyCell(ok(out)?)).into_bound_py_any(py)
         }
 
-        /// Tags every cell with its count of target-valued neighbors under the mask.
         #[pyfunction]
         #[pyo3(name = "neighbors", signature = (cell, mask, target, wrap, dtype))]
         pub fn neighbors<'py>(
@@ -200,7 +183,6 @@ pub mod core {
             (PyCell(ok(out)?)).into_bound_py_any(py)
         }
 
-        /// Wraps a tensor of types in a bare cell, colorless and tagless.
         #[pyfunction]
         #[pyo3(name = "new", signature = (types))]
         pub fn new<'py>(py: Python<'py>, types: PyTensor) -> PyResult<Bound<'py, PyAny>> {
@@ -209,7 +191,6 @@ pub mod core {
             (PyCell(out)).into_bound_py_any(py)
         }
 
-        /// Wraps the cell in count layers of value on every side, dropping colors.
         #[pyfunction]
         #[pyo3(name = "pad", signature = (cell, count, value))]
         pub fn pad<'py>(
@@ -223,7 +204,6 @@ pub mod core {
             (PyCell(out)).into_bound_py_any(py)
         }
 
-        /// Colors every mapped cell, picking within each type's palette by the mode.
         #[pyfunction]
         #[pyo3(name = "paint", signature = (cell, mapping, mode, rng=None))]
         pub fn paint<'py>(
@@ -243,7 +223,6 @@ pub mod core {
             (PyCell(ok(out)?)).into_bound_py_any(py)
         }
 
-        /// Stamps value wherever the tiled mask is on, dropping colors.
         #[pyfunction]
         #[pyo3(name = "perforate", signature = (cell, mask, value))]
         pub fn perforate<'py>(
@@ -258,7 +237,6 @@ pub mod core {
             (PyCell(ok(out)?)).into_bound_py_any(py)
         }
 
-        /// Rebuilds a cell's types, colors and tags at the new shape from one destination-to-source index map.
         #[pyfunction]
         #[pyo3(name = "remap", signature = (cell, map, shape))]
         pub fn remap<'py>(
@@ -272,7 +250,6 @@ pub mod core {
             (PyCell(ok(out)?)).into_bound_py_any(py)
         }
 
-        /// Returns the flat rgba bytes of the cells, four to a cell, the stored color where there is one and opaque black everywhere else.
         #[pyfunction]
         #[pyo3(name = "rgba", signature = (cell))]
         pub fn rgba<'py>(py: Python<'py>, cell: PyCell) -> PyResult<Bound<'py, PyAny>> {
@@ -281,7 +258,6 @@ pub mod core {
             (out).into_bound_py_any(py)
         }
 
-        /// Builds the flat source index of every destination cell after k quarter turns in the plane of the axes.
         #[pyfunction]
         #[pyo3(name = "rot90_map", signature = (shape, k, axes))]
         pub fn rot90_map<'py>(
@@ -294,7 +270,6 @@ pub mod core {
             (ok(out)?).into_bound_py_any(py)
         }
 
-        /// Rotates the cell k quarter turns in the plane of the given axes, carrying colors and tags along.
         #[pyfunction]
         #[pyo3(name = "rotate", signature = (cell, k, axes))]
         pub fn rotate<'py>(
@@ -308,7 +283,6 @@ pub mod core {
             (PyCell(ok(out)?)).into_bound_py_any(py)
         }
 
-        /// Returns the shape of the type tensor.
         #[pyfunction]
         #[pyo3(name = "shape", signature = (cell))]
         pub fn shape<'py>(py: Python<'py>, cell: PyCell) -> PyResult<Bound<'py, PyAny>> {
@@ -317,7 +291,6 @@ pub mod core {
             ((out).to_vec()).into_bound_py_any(py)
         }
 
-        /// Returns the number of cells.
         #[pyfunction]
         #[pyo3(name = "size", signature = (cell))]
         pub fn size<'py>(py: Python<'py>, cell: PyCell) -> PyResult<Bound<'py, PyAny>> {
@@ -326,7 +299,6 @@ pub mod core {
             (out).into_bound_py_any(py)
         }
 
-        /// Repeats the cell reps times along each axis, carrying colors and tags along.
         #[pyfunction]
         #[pyo3(name = "tile", signature = (cell, reps))]
         pub fn tile<'py>(
@@ -339,7 +311,6 @@ pub mod core {
             (PyCell(ok(out)?)).into_bound_py_any(py)
         }
 
-        /// Builds the flat source index of every destination cell after tiling reps copies per axis.
         #[pyfunction]
         #[pyo3(name = "tile_map", signature = (shape, reps))]
         pub fn tile_map<'py>(
@@ -357,10 +328,6 @@ pub mod core {
             sys: &Bound<'_, PyDict>,
         ) -> PyResult<()> {
             let m = PyModule::new(py, "mrly.core.cell")?;
-            m.setattr(
-                "__doc__",
-                "The cell grid: type bytes with optional per-cell colors and tags.",
-            )?;
             m.add_function(wrap_pyfunction!(anti, &m)?)?;
             m.add_function(wrap_pyfunction!(binarize, &m)?)?;
             m.add_function(wrap_pyfunction!(binarize_otsu, &m)?)?;
@@ -424,21 +391,18 @@ pub mod core {
         }
     }
 
-    /// The rgba color, its themes and the fifteen-color palette.
     pub mod colors {
         use crate::hand::{PyColor, PyPixels, PyRgba, PyRng, PyTensor, ok};
         use pyo3::IntoPyObjectExt;
         use pyo3::prelude::*;
         use pyo3::types::PyDict;
 
-        /// One theme: the surfaces of a dark or a light ground and the thirteen inks, the same on both.
         #[pyclass(name = "Theme", module = "mrly.core.colors", from_py_object)]
         #[derive(Clone)]
         pub struct Theme(pub mrly_core::colors::Theme);
 
         #[pymethods]
         impl Theme {
-            /// The ground every figure is painted on.
             #[getter]
             #[pyo3(name = "ground")]
             pub fn ground<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
@@ -452,7 +416,6 @@ pub mod core {
                 self.0.ground = value;
                 Ok(())
             }
-            /// The page background, one step off the ground.
             #[getter]
             #[pyo3(name = "bg")]
             pub fn bg<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
@@ -466,7 +429,6 @@ pub mod core {
                 self.0.bg = value;
                 Ok(())
             }
-            /// The raised panel.
             #[getter]
             #[pyo3(name = "panel")]
             pub fn panel<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
@@ -480,7 +442,6 @@ pub mod core {
                 self.0.panel = value;
                 Ok(())
             }
-            /// The sunken well.
             #[getter]
             #[pyo3(name = "deep")]
             pub fn deep<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
@@ -494,7 +455,6 @@ pub mod core {
                 self.0.deep = value;
                 Ok(())
             }
-            /// The hairline between things.
             #[getter]
             #[pyo3(name = "line")]
             pub fn line<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
@@ -508,7 +468,6 @@ pub mod core {
                 self.0.line = value;
                 Ok(())
             }
-            /// The foreground, the strongest tone.
             #[getter]
             #[pyo3(name = "fg")]
             pub fn fg<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
@@ -522,7 +481,6 @@ pub mod core {
                 self.0.fg = value;
                 Ok(())
             }
-            /// The dimmed foreground, for anything secondary.
             #[getter]
             #[pyo3(name = "dim")]
             pub fn dim<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
@@ -536,7 +494,6 @@ pub mod core {
                 self.0.dim = value;
                 Ok(())
             }
-            /// The interactive accent.
             #[getter]
             #[pyo3(name = "accent")]
             pub fn accent<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
@@ -550,7 +507,6 @@ pub mod core {
                 self.0.accent = value;
                 Ok(())
             }
-            /// The tone written on the accent.
             #[getter]
             #[pyo3(name = "on_accent")]
             pub fn on_accent<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
@@ -564,7 +520,6 @@ pub mod core {
                 self.0.on_accent = value;
                 Ok(())
             }
-            /// The red ink.
             #[getter]
             #[pyo3(name = "red")]
             pub fn red<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
@@ -578,7 +533,6 @@ pub mod core {
                 self.0.red = value;
                 Ok(())
             }
-            /// The orange ink.
             #[getter]
             #[pyo3(name = "orange")]
             pub fn orange<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
@@ -592,7 +546,6 @@ pub mod core {
                 self.0.orange = value;
                 Ok(())
             }
-            /// The yellow ink.
             #[getter]
             #[pyo3(name = "yellow")]
             pub fn yellow<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
@@ -606,7 +559,6 @@ pub mod core {
                 self.0.yellow = value;
                 Ok(())
             }
-            /// The green ink.
             #[getter]
             #[pyo3(name = "green")]
             pub fn green<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
@@ -620,7 +572,6 @@ pub mod core {
                 self.0.green = value;
                 Ok(())
             }
-            /// The mint ink.
             #[getter]
             #[pyo3(name = "mint")]
             pub fn mint<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
@@ -634,7 +585,6 @@ pub mod core {
                 self.0.mint = value;
                 Ok(())
             }
-            /// The teal ink.
             #[getter]
             #[pyo3(name = "teal")]
             pub fn teal<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
@@ -648,7 +598,6 @@ pub mod core {
                 self.0.teal = value;
                 Ok(())
             }
-            /// The cyan ink.
             #[getter]
             #[pyo3(name = "cyan")]
             pub fn cyan<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
@@ -662,7 +611,6 @@ pub mod core {
                 self.0.cyan = value;
                 Ok(())
             }
-            /// The blue ink.
             #[getter]
             #[pyo3(name = "blue")]
             pub fn blue<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
@@ -676,7 +624,6 @@ pub mod core {
                 self.0.blue = value;
                 Ok(())
             }
-            /// The indigo ink.
             #[getter]
             #[pyo3(name = "indigo")]
             pub fn indigo<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
@@ -690,7 +637,6 @@ pub mod core {
                 self.0.indigo = value;
                 Ok(())
             }
-            /// The purple ink.
             #[getter]
             #[pyo3(name = "purple")]
             pub fn purple<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
@@ -704,7 +650,6 @@ pub mod core {
                 self.0.purple = value;
                 Ok(())
             }
-            /// The pink ink.
             #[getter]
             #[pyo3(name = "pink")]
             pub fn pink<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
@@ -718,7 +663,6 @@ pub mod core {
                 self.0.pink = value;
                 Ok(())
             }
-            /// The brown ink.
             #[getter]
             #[pyo3(name = "brown")]
             pub fn brown<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
@@ -732,7 +676,6 @@ pub mod core {
                 self.0.brown = value;
                 Ok(())
             }
-            /// The gray ink.
             #[getter]
             #[pyo3(name = "gray")]
             pub fn gray<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
@@ -746,30 +689,25 @@ pub mod core {
                 self.0.gray = value;
                 Ok(())
             }
-            /// The thirteen inks in name order.
             #[pyo3(name = "hues", signature = ())]
             pub fn hues<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
                 let out = mrly_core::colors::Theme::hues(&self.0);
                 ((out).into_iter().map(PyColor).collect::<Vec<_>>()).into_bound_py_any(py)
             }
-            /// The six inks a figure cycles through: blue, orange, yellow, green, pink, indigo.
             #[pyo3(name = "inks", signature = ())]
             pub fn inks<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
                 let out = mrly_core::colors::Theme::inks(&self.0);
                 ((out).into_iter().map(PyColor).collect::<Vec<_>>()).into_bound_py_any(py)
             }
-            /// Reads plain data into the class.
             #[staticmethod]
             pub fn from_dict(data: &Bound<'_, PyAny>) -> PyResult<Self> {
                 Ok(Self(crate::hand::serde_from_py(data)?))
             }
-            /// Returns the value as plain data.
             pub fn to_dict<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
                 crate::hand::serde_into_py(py, &self.0)
             }
         }
 
-        /// Returns the color with its alpha set to level.
         #[pyfunction]
         #[pyo3(name = "alpha", signature = (color, level))]
         pub fn alpha<'py>(
@@ -782,7 +720,6 @@ pub mod core {
             (PyColor(out)).into_bound_py_any(py)
         }
 
-        /// Returns the ground rgba of the dark or the light theme.
         #[pyfunction]
         #[pyo3(name = "board", signature = (dark))]
         pub fn board<'py>(py: Python<'py>, dark: bool) -> PyResult<Bound<'py, PyAny>> {
@@ -790,7 +727,6 @@ pub mod core {
             (PyRgba(out)).into_bound_py_any(py)
         }
 
-        /// Formats the color as a css rgb or rgba call.
         #[pyfunction]
         #[pyo3(name = "css", signature = (color))]
         pub fn css<'py>(py: Python<'py>, color: PyColor) -> PyResult<Bound<'py, PyAny>> {
@@ -799,7 +735,6 @@ pub mod core {
             (out).into_bound_py_any(py)
         }
 
-        /// Parses a #RRGGBB or #RRGGBBAA code, hash optional.
         #[pyfunction]
         #[pyo3(name = "from_hex", signature = (hex))]
         pub fn from_hex<'py>(py: Python<'py>, hex: &str) -> PyResult<Bound<'py, PyAny>> {
@@ -807,7 +742,6 @@ pub mod core {
             (PyColor(ok(out)?)).into_bound_py_any(py)
         }
 
-        /// Builds a gradient of steps colors sweeping evenly through the given stops.
         #[pyfunction]
         #[pyo3(name = "gradient", signature = (colors, steps))]
         pub fn gradient<'py>(
@@ -820,7 +754,6 @@ pub mod core {
             ((ok(out)?).into_iter().map(PyColor).collect::<Vec<_>>()).into_bound_py_any(py)
         }
 
-        /// Returns the foreground rgba of the dark or the light theme.
         #[pyfunction]
         #[pyo3(name = "ink", signature = (dark))]
         pub fn ink<'py>(py: Python<'py>, dark: bool) -> PyResult<Bound<'py, PyAny>> {
@@ -828,7 +761,6 @@ pub mod core {
             (PyRgba(out)).into_bound_py_any(py)
         }
 
-        /// Returns the color with every channel flipped and the alpha kept.
         #[pyfunction]
         #[pyo3(name = "invert", signature = (color))]
         pub fn invert<'py>(py: Python<'py>, color: PyColor) -> PyResult<Bound<'py, PyAny>> {
@@ -837,7 +769,6 @@ pub mod core {
             (PyColor(out)).into_bound_py_any(py)
         }
 
-        /// Returns the color scaled toward black below level 50 and toward white above.
         #[pyfunction]
         #[pyo3(name = "lightness", signature = (color, level))]
         pub fn lightness<'py>(
@@ -850,7 +781,6 @@ pub mod core {
             (PyColor(ok(out)?)).into_bound_py_any(py)
         }
 
-        /// Reads rgba pixels as a type grid, one wherever the rgb mean falls below the level.
         #[pyfunction]
         #[pyo3(name = "luma_types", signature = (pixels, width, height, level))]
         pub fn luma_types<'py>(
@@ -865,7 +795,6 @@ pub mod core {
             (PyTensor(out)).into_bound_py_any(py)
         }
 
-        /// Blends two colors linearly by ratio.
         #[pyfunction]
         #[pyo3(name = "mix", signature = (color_1, color_2, ratio))]
         pub fn mix<'py>(
@@ -880,7 +809,6 @@ pub mod core {
             (PyColor(ok(out)?)).into_bound_py_any(py)
         }
 
-        /// Returns the palette color a name spells.
         #[pyfunction]
         #[pyo3(name = "named", signature = (name))]
         pub fn named<'py>(py: Python<'py>, name: &str) -> PyResult<Bound<'py, PyAny>> {
@@ -888,7 +816,6 @@ pub mod core {
             (PyColor(ok(out)?)).into_bound_py_any(py)
         }
 
-        /// Draws a color from the stream, opaque unless alpha is asked for.
         #[pyfunction]
         #[pyo3(name = "random", signature = (alpha, rng))]
         pub fn random<'py>(
@@ -900,7 +827,6 @@ pub mod core {
             (PyColor(out)).into_bound_py_any(py)
         }
 
-        /// Builds an opaque color.
         #[pyfunction]
         #[pyo3(name = "rgb", signature = (r, g, b))]
         pub fn rgb<'py>(py: Python<'py>, r: u8, g: u8, b: u8) -> PyResult<Bound<'py, PyAny>> {
@@ -908,7 +834,6 @@ pub mod core {
             (PyColor(out)).into_bound_py_any(py)
         }
 
-        /// Builds a color with an explicit alpha.
         #[pyfunction]
         #[pyo3(name = "rgba", signature = (r, g, b, a))]
         pub fn rgba<'py>(
@@ -922,7 +847,6 @@ pub mod core {
             (PyColor(out)).into_bound_py_any(py)
         }
 
-        /// Returns a hue one shade lighter, itself, and one shade darker.
         #[pyfunction]
         #[pyo3(name = "shades", signature = (hue))]
         pub fn shades<'py>(py: Python<'py>, hue: PyColor) -> PyResult<Bound<'py, PyAny>> {
@@ -931,7 +855,6 @@ pub mod core {
             ((out).into_iter().map(PyColor).collect::<Vec<_>>()).into_bound_py_any(py)
         }
 
-        /// Snaps every pixel to the palette color nearest it in squared rgba distance, first on a tie.
         #[pyfunction]
         #[pyo3(name = "snap", signature = (pixels, palette))]
         pub fn snap<'py>(
@@ -945,7 +868,6 @@ pub mod core {
             (PyPixels(out)).into_bound_py_any(py)
         }
 
-        /// Formats the color as lowercase hex, appending the alpha pair only when not opaque.
         #[pyfunction]
         #[pyo3(name = "to_hex", signature = (color))]
         pub fn to_hex<'py>(py: Python<'py>, color: PyColor) -> PyResult<Bound<'py, PyAny>> {
@@ -960,10 +882,6 @@ pub mod core {
             sys: &Bound<'_, PyDict>,
         ) -> PyResult<()> {
             let m = PyModule::new(py, "mrly.core.colors")?;
-            m.setattr(
-                "__doc__",
-                "The rgba color, its themes and the fifteen-color palette.",
-            )?;
             m.add_class::<Theme>()?;
             m.add_function(wrap_pyfunction!(alpha, &m)?)?;
             m.add_function(wrap_pyfunction!(board, &m)?)?;
@@ -1067,14 +985,12 @@ pub mod core {
         }
     }
 
-    /// The one error type, its Result and the json parser over the rented value.
     pub mod error {
         use crate::hand::{PySerde, ok};
         use pyo3::IntoPyObjectExt;
         use pyo3::prelude::*;
         use pyo3::types::PyDict;
 
-        /// Parses JSON text into a value.
         #[pyfunction]
         #[pyo3(name = "parse", signature = (text))]
         pub fn parse<'py>(py: Python<'py>, text: &str) -> PyResult<Bound<'py, PyAny>> {
@@ -1088,10 +1004,6 @@ pub mod core {
             sys: &Bound<'_, PyDict>,
         ) -> PyResult<()> {
             let m = PyModule::new(py, "mrly.core.error")?;
-            m.setattr(
-                "__doc__",
-                "The one error type, its Result and the json parser over the rented value.",
-            )?;
             m.add_function(wrap_pyfunction!(parse, &m)?)?;
             let names: Vec<&str> = vec!["parse"];
             m.add("__all__", names)?;
@@ -1101,14 +1013,12 @@ pub mod core {
         }
     }
 
-    /// The image a renderer returns: its size and its rgba pixels.
     pub mod image {
         use crate::hand::{PyImage, PyPixels, PySerde, ok};
         use pyo3::IntoPyObjectExt;
         use pyo3::prelude::*;
         use pyo3::types::PyDict;
 
-        /// Box-blurs rgba pixels by radius, each channel the mean of its edge-padded window.
         #[pyfunction]
         #[pyo3(name = "blur", signature = (pixels, width, height, radius))]
         pub fn blur<'py>(
@@ -1123,7 +1033,6 @@ pub mod core {
             (PyPixels(out)).into_bound_py_any(py)
         }
 
-        /// Builds an image from its width, its height and its colors.
         #[pyfunction]
         #[pyo3(name = "new", signature = (width, height, colors))]
         pub fn new<'py>(
@@ -1137,7 +1046,6 @@ pub mod core {
             (PyImage(ok(out)?)).into_bound_py_any(py)
         }
 
-        /// Resamples the image to a new size.
         #[pyfunction]
         #[pyo3(name = "resample", signature = (image, width, height, filter))]
         pub fn resample<'py>(
@@ -1153,7 +1061,6 @@ pub mod core {
             (PyImage(ok(out)?)).into_bound_py_any(py)
         }
 
-        /// Draws every pixel as a scale by scale block, growing both sides by scale.
         #[pyfunction]
         #[pyo3(name = "scale", signature = (image, scale))]
         pub fn scale<'py>(
@@ -1172,10 +1079,6 @@ pub mod core {
             sys: &Bound<'_, PyDict>,
         ) -> PyResult<()> {
             let m = PyModule::new(py, "mrly.core.image")?;
-            m.setattr(
-                "__doc__",
-                "The image a renderer returns: its size and its rgba pixels.",
-            )?;
             m.add_function(wrap_pyfunction!(blur, &m)?)?;
             m.add_function(wrap_pyfunction!(new, &m)?)?;
             m.add_function(wrap_pyfunction!(resample, &m)?)?;
@@ -1188,18 +1091,15 @@ pub mod core {
         }
     }
 
-    /// The canonical names: one JSON object per thing, its views and its id.
     pub mod name {
         use pyo3::prelude::*;
         use pyo3::types::PyDict;
 
-        /// The sha256 digest the ids are cut from.
         pub mod sha {
             use pyo3::IntoPyObjectExt;
             use pyo3::prelude::*;
             use pyo3::types::PyDict;
 
-            /// Returns the sha256 digest of `bytes` as 64 lowercase hex digits.
             #[pyfunction]
             #[pyo3(name = "hex", signature = (bytes))]
             pub fn hex<'py>(py: Python<'py>, bytes: Vec<u8>) -> PyResult<Bound<'py, PyAny>> {
@@ -1207,7 +1107,6 @@ pub mod core {
                 (out).into_bound_py_any(py)
             }
 
-            /// Returns the 32-byte sha256 digest of `bytes`.
             #[pyfunction]
             #[pyo3(name = "sha256", signature = (bytes))]
             pub fn sha256<'py>(py: Python<'py>, bytes: Vec<u8>) -> PyResult<Bound<'py, PyAny>> {
@@ -1215,7 +1114,6 @@ pub mod core {
                 (out).into_bound_py_any(py)
             }
 
-            /// Returns the first eight hex digits of the sha256 digest of `bytes`, the id a name prints.
             #[pyfunction]
             #[pyo3(name = "short", signature = (bytes))]
             pub fn short<'py>(py: Python<'py>, bytes: Vec<u8>) -> PyResult<Bound<'py, PyAny>> {
@@ -1229,7 +1127,6 @@ pub mod core {
                 sys: &Bound<'_, PyDict>,
             ) -> PyResult<()> {
                 let m = PyModule::new(py, "mrly.core.name.sha")?;
-                m.setattr("__doc__", "The sha256 digest the ids are cut from.")?;
                 m.add_function(wrap_pyfunction!(hex, &m)?)?;
                 m.add_function(wrap_pyfunction!(sha256, &m)?)?;
                 m.add_function(wrap_pyfunction!(short, &m)?)?;
@@ -1247,10 +1144,6 @@ pub mod core {
             sys: &Bound<'_, PyDict>,
         ) -> PyResult<()> {
             let m = PyModule::new(py, "mrly.core.name")?;
-            m.setattr(
-                "__doc__",
-                "The canonical names: one JSON object per thing, its views and its id.",
-            )?;
             let names: Vec<&str> = vec![];
             m.add("__all__", names)?;
             sha::init(py, &m, sys)?;
@@ -1260,21 +1153,18 @@ pub mod core {
         }
     }
 
-    /// The editions that distribute a palette over a cell.
     pub mod paint {
         use crate::hand::{PyColor, PyRng, PySerde, PyTensor, ok};
         use pyo3::IntoPyObjectExt;
         use pyo3::prelude::*;
         use pyo3::types::PyDict;
 
-        /// A complete coloring recipe for one cell.
         #[pyclass(name = "Paint", module = "mrly.core.paint", from_py_object)]
         #[derive(Clone)]
         pub struct Paint(pub mrly_core::paint::Paint);
 
         #[pymethods]
         impl Paint {
-            /// Builds a black-primary, fill-target, multicolor paint for an edition.
             #[new]
             #[pyo3(signature = (edition))]
             pub fn __new__(edition: PySerde<mrly_core::paint::Edition>) -> PyResult<Self> {
@@ -1282,7 +1172,6 @@ pub mod core {
                 let out = mrly_core::paint::Paint::new(edition);
                 Ok(Self(out))
             }
-            /// The coloring edition.
             #[getter]
             #[pyo3(name = "edition")]
             pub fn edition<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
@@ -1299,7 +1188,6 @@ pub mod core {
                 self.0.edition = value;
                 Ok(())
             }
-            /// The secondary color scheme.
             #[getter]
             #[pyo3(name = "scheme")]
             pub fn scheme<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
@@ -1313,7 +1201,6 @@ pub mod core {
                 self.0.scheme = value;
                 Ok(())
             }
-            /// The side the primary ink lands on.
             #[getter]
             #[pyo3(name = "target")]
             pub fn target<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
@@ -1327,7 +1214,6 @@ pub mod core {
                 self.0.target = value;
                 Ok(())
             }
-            /// The primary ink.
             #[getter]
             #[pyo3(name = "primary")]
             pub fn primary<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
@@ -1341,7 +1227,6 @@ pub mod core {
                 self.0.primary = value;
                 Ok(())
             }
-            /// The secondary inks.
             #[getter]
             #[pyo3(name = "secondary")]
             pub fn secondary<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
@@ -1358,7 +1243,6 @@ pub mod core {
                 self.0.secondary = value;
                 Ok(())
             }
-            /// The shade indices of a multitone ramp.
             #[getter]
             #[pyo3(name = "shades")]
             pub fn shades<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
@@ -1371,13 +1255,11 @@ pub mod core {
                 self.0.shades = value;
                 Ok(())
             }
-            /// Returns true for the Simple edition.
             #[pyo3(name = "is_simple", signature = ())]
             pub fn is_simple<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
                 let out = mrly_core::paint::Paint::is_simple(&self.0);
                 (out).into_bound_py_any(py)
             }
-            /// Builds a black-primary, fill-target, multicolor paint for an edition.
             #[staticmethod]
             #[pyo3(name = "new", signature = (edition))]
             pub fn new_<'py>(
@@ -1388,24 +1270,20 @@ pub mod core {
                 let out = mrly_core::paint::Paint::new(edition);
                 (crate::doors::core::paint::Paint(out)).into_bound_py_any(py)
             }
-            /// Reads plain data into the class.
             #[staticmethod]
             pub fn from_dict(data: &Bound<'_, PyAny>) -> PyResult<Self> {
                 Ok(Self(crate::hand::serde_from_py(data)?))
             }
-            /// Returns the value as plain data.
             pub fn to_dict<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
                 crate::hand::serde_into_py(py, &self.0)
             }
         }
 
-        /// The constraints a caller may put on a random paint.
         #[pyclass(name = "Config", module = "mrly.core.paint", skip_from_py_object)]
         pub struct Config;
 
         #[pymethods]
         impl Config {
-            /// Returns the default Config.
             #[staticmethod]
             #[pyo3(name = "default", signature = ())]
             pub fn default<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
@@ -1414,20 +1292,17 @@ pub mod core {
             }
         }
 
-        /// The seven ways a paint distributes its colors over a cell.
         #[pyclass(name = "Edition", module = "mrly.core.paint", skip_from_py_object)]
         pub struct Edition;
 
         #[pymethods]
         impl Edition {
-            /// Returns every Edition in canonical order.
             #[staticmethod]
             #[pyo3(name = "all", signature = ())]
             pub fn all<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
                 let out = mrly_core::paint::Edition::all();
                 ((out).into_iter().map(PySerde).collect::<Vec<_>>()).into_bound_py_any(py)
             }
-            /// Returns the cell-painting mode this edition renders with, or None for Random, which scatters.
             #[staticmethod]
             #[pyo3(name = "mode", signature = (edition))]
             pub fn mode<'py>(
@@ -1440,20 +1315,17 @@ pub mod core {
             }
         }
 
-        /// The fifteen named inks a paint draws from.
         #[pyclass(name = "Ink", module = "mrly.core.paint", skip_from_py_object)]
         pub struct Ink;
 
         #[pymethods]
         impl Ink {
-            /// Returns every Ink in canonical order.
             #[staticmethod]
             #[pyo3(name = "all", signature = ())]
             pub fn all<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
                 let out = mrly_core::paint::Ink::all();
                 ((out).into_iter().map(PySerde).collect::<Vec<_>>()).into_bound_py_any(py)
             }
-            /// Returns the ink's color.
             #[staticmethod]
             #[pyo3(name = "color", signature = (ink))]
             pub fn color<'py>(
@@ -1466,13 +1338,11 @@ pub mod core {
             }
         }
 
-        /// The two ways secondary colors are drawn.
         #[pyclass(name = "Scheme", module = "mrly.core.paint", skip_from_py_object)]
         pub struct Scheme;
 
         #[pymethods]
         impl Scheme {
-            /// Returns every Scheme in canonical order.
             #[staticmethod]
             #[pyo3(name = "all", signature = ())]
             pub fn all<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
@@ -1481,13 +1351,11 @@ pub mod core {
             }
         }
 
-        /// The side of the figure the primary ink lands on.
         #[pyclass(name = "Target", module = "mrly.core.paint", skip_from_py_object)]
         pub struct Target;
 
         #[pymethods]
         impl Target {
-            /// Returns every Target in canonical order.
             #[staticmethod]
             #[pyo3(name = "all", signature = ())]
             pub fn all<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
@@ -1496,7 +1364,6 @@ pub mod core {
             }
         }
 
-        /// Colors the cell from the paint's inks under its edition mode, scattering the Random edition from the stream.
         #[pyfunction]
         #[pyo3(name = "apply", signature = (paint, cell, rng))]
         pub fn apply<'py>(
@@ -1511,7 +1378,6 @@ pub mod core {
             (ok(out)?).into_bound_py_any(py)
         }
 
-        /// Replays a stored paint onto a cell, tagging first and applying it from the stream.
         #[pyfunction]
         #[pyo3(name = "coat", signature = (cell, paint, mask, rng))]
         pub fn coat<'py>(
@@ -1528,7 +1394,6 @@ pub mod core {
             (ok(out)?).into_bound_py_any(py)
         }
 
-        /// Draws a random paint under the config, applies it to the cell, and returns the recipe.
         #[pyfunction]
         #[pyo3(name = "paint", signature = (cell, config, mask, rng))]
         pub fn paint<'py>(
@@ -1546,7 +1411,6 @@ pub mod core {
             (crate::doors::core::paint::Paint(ok(out)?)).into_bound_py_any(py)
         }
 
-        /// Tags the cell for Layers and Neighbors paints and sizes the palette to the tag count.
         #[pyfunction]
         #[pyo3(name = "prime", signature = (paint, cell, mask, rng))]
         pub fn prime<'py>(
@@ -1564,7 +1428,6 @@ pub mod core {
             (crate::doors::core::paint::Paint(ok(out)?)).into_bound_py_any(py)
         }
 
-        /// Draws a random edition from the allowed list, or from all seven.
         #[pyfunction]
         #[pyo3(name = "random_edition", signature = (editions, rng))]
         pub fn random_edition<'py>(
@@ -1577,7 +1440,6 @@ pub mod core {
             (PySerde(out)).into_bound_py_any(py)
         }
 
-        /// Redraws the paint's secondary inks and shades under its scheme.
         #[pyfunction]
         #[pyo3(name = "reroll", signature = (paint, rng))]
         pub fn reroll<'py>(
@@ -1590,7 +1452,6 @@ pub mod core {
             (crate::doors::core::paint::Paint(out)).into_bound_py_any(py)
         }
 
-        /// Draws the paint's scheme, target and primary under the config, then rerolls the rest.
         #[pyfunction]
         #[pyo3(name = "setup", signature = (paint, config, rng))]
         pub fn setup<'py>(
@@ -1605,7 +1466,6 @@ pub mod core {
             (crate::doors::core::paint::Paint(out)).into_bound_py_any(py)
         }
 
-        /// Tags the cell for the Layers and Neighbors editions and returns the distinct tag count on the secondary side.
         #[pyfunction]
         #[pyo3(name = "tag", signature = (cell, edition, target, mask=None))]
         pub fn tag<'py>(
@@ -1630,10 +1490,6 @@ pub mod core {
             sys: &Bound<'_, PyDict>,
         ) -> PyResult<()> {
             let m = PyModule::new(py, "mrly.core.paint")?;
-            m.setattr(
-                "__doc__",
-                "The editions that distribute a palette over a cell.",
-            )?;
             m.add_class::<Paint>()?;
             m.add_class::<Config>()?;
             m.add_class::<Edition>()?;
@@ -1671,14 +1527,12 @@ pub mod core {
         }
     }
 
-    /// The colorizers that turn counter values into colors.
     pub mod ramp {
         use crate::hand::{PyColor, PyPixels, PySerde};
         use pyo3::IntoPyObjectExt;
         use pyo3::prelude::*;
         use pyo3::types::PyDict;
 
-        /// Returns the color for one value against the range maximum: the background at zero, the top of the ramp from the maximum up.
         #[pyfunction]
         #[pyo3(name = "color", signature = (colorizer, value, max))]
         pub fn color<'py>(
@@ -1692,7 +1546,6 @@ pub mod core {
             (PyColor(out)).into_bound_py_any(py)
         }
 
-        /// Maps a slice of values to rgba pixels against the range maximum.
         #[pyfunction]
         #[pyo3(name = "colors", signature = (colorizer, values, max))]
         pub fn colors<'py>(
@@ -1712,10 +1565,6 @@ pub mod core {
             sys: &Bound<'_, PyDict>,
         ) -> PyResult<()> {
             let m = PyModule::new(py, "mrly.core.ramp")?;
-            m.setattr(
-                "__doc__",
-                "The colorizers that turn counter values into colors.",
-            )?;
             m.add_function(wrap_pyfunction!(color, &m)?)?;
             m.add_function(wrap_pyfunction!(colors, &m)?)?;
             let names: Vec<&str> = vec!["color", "colors"];
@@ -1726,14 +1575,12 @@ pub mod core {
         }
     }
 
-    /// The seeded random stream.
     pub mod rng {
         use crate::hand::PyRng;
         use pyo3::IntoPyObjectExt;
         use pyo3::prelude::*;
         use pyo3::types::PyDict;
 
-        /// Draws an integer below n, or zero when n is zero.
         #[pyfunction]
         #[pyo3(name = "below", signature = (rng, n))]
         pub fn below<'py>(
@@ -1745,7 +1592,6 @@ pub mod core {
             (out).into_bound_py_any(py)
         }
 
-        /// Draws a fair coin flip.
         #[pyfunction]
         #[pyo3(name = "boolean", signature = (rng))]
         pub fn boolean<'py>(py: Python<'py>, rng: &mut PyRng) -> PyResult<Bound<'py, PyAny>> {
@@ -1753,7 +1599,6 @@ pub mod core {
             (out).into_bound_py_any(py)
         }
 
-        /// Returns true with probability p.
         #[pyfunction]
         #[pyo3(name = "chance", signature = (rng, p))]
         pub fn chance<'py>(
@@ -1765,7 +1610,6 @@ pub mod core {
             (out).into_bound_py_any(py)
         }
 
-        /// Builds the stream from a seed.
         #[pyfunction]
         #[pyo3(name = "new", signature = (seed))]
         pub fn new<'py>(py: Python<'py>, seed: u64) -> PyResult<Bound<'py, PyAny>> {
@@ -1773,7 +1617,6 @@ pub mod core {
             (PyRng(out)).into_bound_py_any(py)
         }
 
-        /// Draws an integer between lo and hi inclusive, or lo when hi is not above lo.
         #[pyfunction]
         #[pyo3(name = "range", signature = (rng, lo, hi))]
         pub fn range<'py>(
@@ -1786,7 +1629,6 @@ pub mod core {
             (out).into_bound_py_any(py)
         }
 
-        /// Draws amount distinct indices below length, or every index when amount is larger.
         #[pyfunction]
         #[pyo3(name = "sample_indices", signature = (rng, length, amount))]
         pub fn sample_indices<'py>(
@@ -1799,7 +1641,6 @@ pub mod core {
             (out).into_bound_py_any(py)
         }
 
-        /// Draws a float at or above zero and below one.
         #[pyfunction]
         #[pyo3(name = "unit", signature = (rng))]
         pub fn unit<'py>(py: Python<'py>, rng: &mut PyRng) -> PyResult<Bound<'py, PyAny>> {
@@ -1813,7 +1654,6 @@ pub mod core {
             sys: &Bound<'_, PyDict>,
         ) -> PyResult<()> {
             let m = PyModule::new(py, "mrly.core.rng")?;
-            m.setattr("__doc__", "The seeded random stream.")?;
             m.add_function(wrap_pyfunction!(below, &m)?)?;
             m.add_function(wrap_pyfunction!(boolean, &m)?)?;
             m.add_function(wrap_pyfunction!(chance, &m)?)?;
@@ -1837,14 +1677,12 @@ pub mod core {
         }
     }
 
-    /// The tensor and its dtypes.
     pub mod tensor {
         use crate::hand::{PySerde, PyTensor, ok};
         use pyo3::IntoPyObjectExt;
         use pyo3::prelude::*;
         use pyo3::types::PyDict;
 
-        /// Returns the element at a flat index, which must be below the size like a slice index.
         #[pyfunction]
         #[pyo3(name = "at", signature = (tensor, flat))]
         pub fn at<'py>(
@@ -1857,7 +1695,6 @@ pub mod core {
             (out).into_bound_py_any(py)
         }
 
-        /// Maps every element to one at or above the threshold, zero below.
         #[pyfunction]
         #[pyo3(name = "binarize", signature = (tensor, threshold))]
         pub fn binarize<'py>(
@@ -1870,7 +1707,6 @@ pub mod core {
             (PyTensor(out)).into_bound_py_any(py)
         }
 
-        /// Binarizes at one above the Otsu threshold.
         #[pyfunction]
         #[pyo3(name = "binarize_otsu", signature = (tensor))]
         pub fn binarize_otsu<'py>(
@@ -1882,7 +1718,6 @@ pub mod core {
             (PyTensor(out)).into_bound_py_any(py)
         }
 
-        /// Averages every position over its masked neighborhood, rounded.
         #[pyfunction]
         #[pyo3(name = "blur", signature = (tensor, mask, wrap))]
         pub fn blur<'py>(
@@ -1897,7 +1732,6 @@ pub mod core {
             (PyTensor(ok(out)?)).into_bound_py_any(py)
         }
 
-        /// Returns the elements as bytes.
         #[pyfunction]
         #[pyo3(name = "bytes", signature = (tensor))]
         pub fn bytes<'py>(py: Python<'py>, tensor: PyTensor) -> PyResult<Bound<'py, PyAny>> {
@@ -1906,7 +1740,6 @@ pub mod core {
             ((ok(out)?).to_vec()).into_bound_py_any(py)
         }
 
-        /// Counts the cells holding one value.
         #[pyfunction]
         #[pyo3(name = "count", signature = (tensor, value))]
         pub fn count<'py>(
@@ -1919,7 +1752,6 @@ pub mod core {
             (out).into_bound_py_any(py)
         }
 
-        /// Returns the element width.
         #[pyfunction]
         #[pyo3(name = "dtype", signature = (tensor))]
         pub fn dtype<'py>(py: Python<'py>, tensor: PyTensor) -> PyResult<Bound<'py, PyAny>> {
@@ -1928,7 +1760,6 @@ pub mod core {
             (PySerde(out)).into_bound_py_any(py)
         }
 
-        /// Counts the faces where filled cells meet empty cells or the boundary: perimeter in 2d, surface in 3d.
         #[pyfunction]
         #[pyo3(name = "exposed", signature = (tensor))]
         pub fn exposed<'py>(py: Python<'py>, tensor: PyTensor) -> PyResult<Bound<'py, PyAny>> {
@@ -1937,7 +1768,6 @@ pub mod core {
             (out).into_bound_py_any(py)
         }
 
-        /// Builds a tensor of the shape and width filled with one value.
         #[pyfunction]
         #[pyo3(name = "filled", signature = (shape, value, dtype))]
         pub fn filled<'py>(
@@ -1951,7 +1781,6 @@ pub mod core {
             (PyTensor(out)).into_bound_py_any(py)
         }
 
-        /// Reverses the tensor along one axis.
         #[pyfunction]
         #[pyo3(name = "flip", signature = (tensor, axis))]
         pub fn flip<'py>(
@@ -1964,7 +1793,6 @@ pub mod core {
             (PyTensor(ok(out)?)).into_bound_py_any(py)
         }
 
-        /// Folds the tensor into its level-fold Kronecker power.
         #[pyfunction]
         #[pyo3(name = "fractal", signature = (tensor, level))]
         pub fn fractal<'py>(
@@ -1977,7 +1805,6 @@ pub mod core {
             (PyTensor(out)).into_bound_py_any(py)
         }
 
-        /// Builds a u8 tensor filled with one value.
         #[pyfunction]
         #[pyo3(name = "full", signature = (shape, value))]
         pub fn full<'py>(
@@ -1989,7 +1816,6 @@ pub mod core {
             (PyTensor(out)).into_bound_py_any(py)
         }
 
-        /// Returns the byte at a multi-index.
         #[pyfunction]
         #[pyo3(name = "get", signature = (tensor, multi))]
         pub fn get<'py>(
@@ -2002,7 +1828,6 @@ pub mod core {
             (ok(out)?).into_bound_py_any(py)
         }
 
-        /// Wraps an i32 vector as a tensor of the shape.
         #[pyfunction]
         #[pyo3(name = "i32", signature = (data, shape))]
         pub fn i32_<'py>(
@@ -2014,7 +1839,6 @@ pub mod core {
             (PyTensor(ok(out)?)).into_bound_py_any(py)
         }
 
-        /// Returns the elements as i32s.
         #[pyfunction]
         #[pyo3(name = "i32s", signature = (tensor))]
         pub fn i32s<'py>(py: Python<'py>, tensor: PyTensor) -> PyResult<Bound<'py, PyAny>> {
@@ -2023,7 +1847,6 @@ pub mod core {
             ((ok(out)?).to_vec()).into_bound_py_any(py)
         }
 
-        /// Folds a multi-index into its flat index.
         #[pyfunction]
         #[pyo3(name = "index", signature = (tensor, multi))]
         pub fn index<'py>(
@@ -2036,7 +1859,6 @@ pub mod core {
             (out).into_bound_py_any(py)
         }
 
-        /// Flips every element between zero and one.
         #[pyfunction]
         #[pyo3(name = "invert", signature = (tensor))]
         pub fn invert<'py>(py: Python<'py>, tensor: PyTensor) -> PyResult<Bound<'py, PyAny>> {
@@ -2045,7 +1867,6 @@ pub mod core {
             (PyTensor(out)).into_bound_py_any(py)
         }
 
-        /// Builds the Kronecker product of the two tensors.
         #[pyfunction]
         #[pyo3(name = "kron", signature = (tensor, other))]
         pub fn kron<'py>(
@@ -2059,7 +1880,6 @@ pub mod core {
             (PyTensor(out)).into_bound_py_any(py)
         }
 
-        /// Numbers every position by its concentric ring out from the center.
         #[pyfunction]
         #[pyo3(name = "layers", signature = (tensor, dtype))]
         pub fn layers<'py>(
@@ -2073,7 +1893,6 @@ pub mod core {
             (PyTensor(out)).into_bound_py_any(py)
         }
 
-        /// Counts each position's masked neighbors holding the target bit.
         #[pyfunction]
         #[pyo3(name = "neighbors", signature = (tensor, mask, target, wrap, dtype))]
         pub fn neighbors<'py>(
@@ -2091,7 +1910,6 @@ pub mod core {
             (PyTensor(ok(out)?)).into_bound_py_any(py)
         }
 
-        /// Builds a zeroed u8 tensor of the shape.
         #[pyfunction]
         #[pyo3(name = "new", signature = (shape))]
         pub fn new<'py>(py: Python<'py>, shape: Vec<usize>) -> PyResult<Bound<'py, PyAny>> {
@@ -2099,7 +1917,6 @@ pub mod core {
             (PyTensor(out)).into_bound_py_any(py)
         }
 
-        /// Wraps a byte vector as a tensor of the shape.
         #[pyfunction]
         #[pyo3(name = "of", signature = (data, shape))]
         pub fn of<'py>(
@@ -2111,7 +1928,6 @@ pub mod core {
             (PyTensor(ok(out)?)).into_bound_py_any(py)
         }
 
-        /// Returns the Otsu threshold splitting the histogram at greatest variance.
         #[pyfunction]
         #[pyo3(name = "otsu_threshold", signature = (tensor))]
         pub fn otsu_threshold<'py>(
@@ -2123,7 +1939,6 @@ pub mod core {
             (out).into_bound_py_any(py)
         }
 
-        /// Wraps the tensor in a count-thick border of one value.
         #[pyfunction]
         #[pyo3(name = "pad", signature = (tensor, count, value))]
         pub fn pad<'py>(
@@ -2137,7 +1952,6 @@ pub mod core {
             (PyTensor(out)).into_bound_py_any(py)
         }
 
-        /// Stamps the value wherever the tiled mask is nonzero.
         #[pyfunction]
         #[pyo3(name = "perforate", signature = (tensor, mask, value))]
         pub fn perforate<'py>(
@@ -2152,7 +1966,6 @@ pub mod core {
             (PyTensor(ok(out)?)).into_bound_py_any(py)
         }
 
-        /// Writes the element at a flat index, which must be below the size like a slice index.
         #[pyfunction]
         #[pyo3(name = "put", signature = (tensor, flat, value))]
         pub fn put<'py>(
@@ -2167,7 +1980,6 @@ pub mod core {
             ().into_bound_py_any(py)
         }
 
-        /// Rotates the tensor k quarter turns in the plane of two axes.
         #[pyfunction]
         #[pyo3(name = "rot90", signature = (tensor, k, axes))]
         pub fn rot90<'py>(
@@ -2181,7 +1993,6 @@ pub mod core {
             (PyTensor(ok(out)?)).into_bound_py_any(py)
         }
 
-        /// Writes the byte at a multi-index.
         #[pyfunction]
         #[pyo3(name = "set", signature = (tensor, multi, value))]
         pub fn set<'py>(
@@ -2196,7 +2007,6 @@ pub mod core {
             (ok(out)?).into_bound_py_any(py)
         }
 
-        /// Returns the number of elements.
         #[pyfunction]
         #[pyo3(name = "size", signature = (tensor))]
         pub fn size<'py>(py: Python<'py>, tensor: PyTensor) -> PyResult<Bound<'py, PyAny>> {
@@ -2205,7 +2015,6 @@ pub mod core {
             (out).into_bound_py_any(py)
         }
 
-        /// Drops one axis by fixing it at an index.
         #[pyfunction]
         #[pyo3(name = "slice", signature = (tensor, axis, index))]
         pub fn slice<'py>(
@@ -2219,7 +2028,6 @@ pub mod core {
             (PyTensor(ok(out)?)).into_bound_py_any(py)
         }
 
-        /// Returns the sum of all elements.
         #[pyfunction]
         #[pyo3(name = "sum", signature = (tensor))]
         pub fn sum<'py>(py: Python<'py>, tensor: PyTensor) -> PyResult<Bound<'py, PyAny>> {
@@ -2228,7 +2036,6 @@ pub mod core {
             (out).into_bound_py_any(py)
         }
 
-        /// Repeats the tensor the given number of times along each axis.
         #[pyfunction]
         #[pyo3(name = "tile", signature = (tensor, reps))]
         pub fn tile<'py>(
@@ -2241,7 +2048,6 @@ pub mod core {
             (PyTensor(ok(out)?)).into_bound_py_any(py)
         }
 
-        /// Swaps two axes.
         #[pyfunction]
         #[pyo3(name = "transpose", signature = (tensor, a, b))]
         pub fn transpose<'py>(
@@ -2255,7 +2061,6 @@ pub mod core {
             (PyTensor(ok(out)?)).into_bound_py_any(py)
         }
 
-        /// Builds a zeroed tensor of the shape and width.
         #[pyfunction]
         #[pyo3(name = "typed", signature = (shape, dtype))]
         pub fn typed<'py>(
@@ -2268,7 +2073,6 @@ pub mod core {
             (PyTensor(out)).into_bound_py_any(py)
         }
 
-        /// Wraps a u16 vector as a tensor of the shape.
         #[pyfunction]
         #[pyo3(name = "u16", signature = (data, shape))]
         pub fn u16_<'py>(
@@ -2280,7 +2084,6 @@ pub mod core {
             (PyTensor(ok(out)?)).into_bound_py_any(py)
         }
 
-        /// Returns the elements as u16s.
         #[pyfunction]
         #[pyo3(name = "u16s", signature = (tensor))]
         pub fn u16s<'py>(py: Python<'py>, tensor: PyTensor) -> PyResult<Bound<'py, PyAny>> {
@@ -2289,7 +2092,6 @@ pub mod core {
             ((ok(out)?).to_vec()).into_bound_py_any(py)
         }
 
-        /// Wraps a u32 vector as a tensor of the shape.
         #[pyfunction]
         #[pyo3(name = "u32", signature = (data, shape))]
         pub fn u32_<'py>(
@@ -2301,7 +2103,6 @@ pub mod core {
             (PyTensor(ok(out)?)).into_bound_py_any(py)
         }
 
-        /// Returns the elements as u32s.
         #[pyfunction]
         #[pyo3(name = "u32s", signature = (tensor))]
         pub fn u32s<'py>(py: Python<'py>, tensor: PyTensor) -> PyResult<Bound<'py, PyAny>> {
@@ -2310,7 +2111,6 @@ pub mod core {
             ((ok(out)?).to_vec()).into_bound_py_any(py)
         }
 
-        /// Wraps a u8 vector as a tensor of the shape, the same door as `Tensor::of`.
         #[pyfunction]
         #[pyo3(name = "u8", signature = (data, shape))]
         pub fn u8_<'py>(
@@ -2328,7 +2128,6 @@ pub mod core {
             sys: &Bound<'_, PyDict>,
         ) -> PyResult<()> {
             let m = PyModule::new(py, "mrly.core.tensor")?;
-            m.setattr("__doc__", "The tensor and its dtypes.")?;
             m.add_function(wrap_pyfunction!(at, &m)?)?;
             m.add_function(wrap_pyfunction!(binarize, &m)?)?;
             m.add_function(wrap_pyfunction!(binarize_otsu, &m)?)?;
@@ -2416,34 +2215,29 @@ pub mod core {
         }
     }
 
-    /// A rule that turns counter values into colors.
     #[pyclass(name = "Colorizer", module = "mrly.core", skip_from_py_object)]
     pub struct Colorizer;
 
     #[pymethods]
     impl Colorizer {
-        /// Returns the default Colorizer.
         #[staticmethod]
         #[pyo3(name = "default", signature = ())]
         pub fn default<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
             let out = mrly_core::Colorizer::default();
             (PySerde(out)).into_bound_py_any(py)
         }
-        /// Builds the blue-to-red diverging ramp around a white middle.
         #[staticmethod]
         #[pyo3(name = "diverge", signature = ())]
         pub fn diverge<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
             let out = mrly_core::Colorizer::diverge();
             (PySerde(out)).into_bound_py_any(py)
         }
-        /// Builds the black-through-ember fire ramp: black, dark red, orange, light yellow.
         #[staticmethod]
         #[pyo3(name = "fire", signature = ())]
         pub fn fire<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
             let out = mrly_core::Colorizer::fire();
             (PySerde(out)).into_bound_py_any(py)
         }
-        /// Builds a binned colorizer from a gradient through the given stops.
         #[staticmethod]
         #[pyo3(name = "gradient_bins", signature = (background, colors, shades))]
         pub fn gradient_bins<'py>(
@@ -2457,7 +2251,6 @@ pub mod core {
             let out = mrly_core::Colorizer::gradient_bins(background, &colors, shades);
             (PySerde(ok(out)?)).into_bound_py_any(py)
         }
-        /// Builds the white-to-black heat ramp.
         #[staticmethod]
         #[pyo3(name = "heat", signature = ())]
         pub fn heat<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
@@ -2466,13 +2259,11 @@ pub mod core {
         }
     }
 
-    /// The element widths a tensor can hold.
     #[pyclass(name = "Dtype", module = "mrly.core", skip_from_py_object)]
     pub struct Dtype;
 
     #[pymethods]
     impl Dtype {
-        /// Returns the largest value the width can hold.
         #[staticmethod]
         #[pyo3(name = "max", signature = (dtype))]
         pub fn max<'py>(
@@ -2485,7 +2276,6 @@ pub mod core {
         }
     }
 
-    /// Squashes rgba pixels to the hex aspect, returning the new width, height and pixels.
     #[pyfunction]
     #[pyo3(name = "hex_fit", signature = (pixels, width, height, vertical, filter))]
     pub fn hex_fit<'py>(
@@ -2506,7 +2296,6 @@ pub mod core {
         .into_bound_py_any(py)
     }
 
-    /// Returns the size a hex rendering wears, the named axis squashed by the triangle ratio.
     #[pyfunction]
     #[pyo3(name = "hex_size", signature = (width, height, vertical))]
     pub fn hex_size<'py>(
@@ -2519,7 +2308,6 @@ pub mod core {
         (out).into_bound_py_any(py)
     }
 
-    /// Resamples rgba pixels to a new size.
     #[pyfunction]
     #[pyo3(name = "resample", signature = (pixels, width, height, out_w, out_h, filter))]
     pub fn resample<'py>(
@@ -2543,7 +2331,6 @@ pub mod core {
         sys: &Bound<'_, PyDict>,
     ) -> PyResult<()> {
         let m = PyModule::new(py, "mrly.core")?;
-        m.setattr("__doc__", "The substrate: tensors, cells, colors, images, resampling, seeded chance and the canonical names.\n\nThe road from a grid of bytes to pixels, and the one JSON object every mrly thing is named by.\n\n- `tensor` makes and tallies the byte grids; `cell` dresses one in colors and tags.\n- `colors` holds the rgba color, the two themes and the house palette; `paint` spreads a palette over a cell.\n- `ramp` turns counter values into colors; `resample` rescales pixels and squashes them for hex.\n- `image` holds the rgba pixels a renderer returns; encoding them into a file is the caller's.\n- `rng` deals seeded chance: one xoshiro256++ stream, passed by hand, never global.\n- `error` holds the one error, its Result and the json parser.\n- `name` holds the `Named` trait, the `kind!` marker, the text views and the sha256 a name's id is cut from; `named_enum!` names an enum.\n\nThe json value and map are serde_json's, kept under `preserve_order` so an object comes back in the order it was written and both bridges print the same text.\n\nThe doors: `Tensor::of`, `Tensor::rot90`, `Color::from_hex`, `Color::to_hex`, `Image::scale` and `ramp::color`.")?;
         m.add_class::<PyRng>()?;
         m.add_class::<Colorizer>()?;
         m.add_class::<Dtype>()?;

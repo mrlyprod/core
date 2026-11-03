@@ -1,5 +1,3 @@
-#![allow(missing_docs)]
-
 use crate::Json;
 use crate::cell::Cell;
 use crate::colors::Color;
@@ -16,8 +14,6 @@ use std::str::FromStr;
 use wasm_bindgen::JsCast;
 use wasm_bindgen::prelude::*;
 
-// ERRORS
-
 pub fn throw(error: Error) -> JsValue {
     js_sys::Error::new(&error.to_string()).into()
 }
@@ -25,8 +21,6 @@ pub fn throw(error: Error) -> JsValue {
 pub fn refuse(message: &str) -> JsValue {
     js_sys::Error::new(message).into()
 }
-
-// SERDE
 
 fn serializer() -> serde_wasm_bindgen::Serializer {
     serde_wasm_bindgen::Serializer::new().serialize_maps_as_objects(true)
@@ -60,8 +54,6 @@ pub fn plain(value: &JsValue) -> Result<JsValue, JsValue> {
     }
 }
 
-// FIELDS
-
 pub fn field(value: &JsValue, name: &str) -> Result<JsValue, JsValue> {
     js_sys::Reflect::get(value, &JsValue::from_str(name))
 }
@@ -85,8 +77,6 @@ fn object(value: &JsValue) -> Result<&js_sys::Object, JsValue> {
 fn missing(value: &JsValue) -> bool {
     value.is_undefined() || value.is_null()
 }
-
-// SCALARS
 
 pub fn number_from_js(value: &JsValue) -> Result<f64, JsValue> {
     value
@@ -163,8 +153,6 @@ pub fn u64_from_js(value: &JsValue) -> Result<u64, JsValue> {
 pub fn i64_from_js(value: &JsValue) -> Result<i64, JsValue> {
     wide_from_js(value, "an i64")
 }
-
-// LISTS
 
 pub fn list_from_js<T>(
     value: &JsValue,
@@ -307,8 +295,6 @@ pub fn typed<T: Typed + ?Sized>(items: &T) -> JsValue {
     items.typed()
 }
 
-// SHAPES
-
 pub fn shape_to_js(shape: &[usize]) -> JsValue {
     shape
         .iter()
@@ -332,8 +318,6 @@ pub fn shape_from_js(value: &JsValue) -> Result<Vec<usize>, JsValue> {
         })
         .collect()
 }
-
-// BUFFERS
 
 pub fn bytes_to_js(bytes: &[u8]) -> JsValue {
     js_sys::Uint8Array::from(bytes).into()
@@ -383,8 +367,6 @@ fn data_from_js(value: &JsValue, shape: Vec<usize>) -> Result<Tensor, JsValue> {
     Tensor::u8(bytes_from_js(value)?, shape).map_err(throw)
 }
 
-// TENSORS
-
 fn fill_tensor(out: &js_sys::Object, tensor: &Tensor) -> Result<(), JsValue> {
     put(out, "shape", shape_to_js(&tensor.shape))?;
     put(out, "data", data_to_js(tensor)?)
@@ -404,8 +386,6 @@ pub fn tensor_from_js(value: &JsValue) -> Result<Tensor, JsValue> {
     let shape = shape_from_js(&field(value, "shape")?)?;
     data_from_js(&field(value, "data")?, shape)
 }
-
-// CELLS
 
 fn fill_cell(out: &js_sys::Object, cell: &Cell) -> Result<(), JsValue> {
     put(out, "shape", shape_to_js(&cell.types.shape))?;
@@ -467,8 +447,6 @@ pub fn cell_rank(value: &JsValue) -> Result<usize, JsValue> {
     Ok(shape_from_js(&field(value, "shape")?)?.len())
 }
 
-// IMAGES
-
 pub fn image_to_js(image: &Image) -> Result<JsValue, JsValue> {
     let out = js_sys::Object::new();
     put(&out, "shape", shape_to_js(&[image.height, image.width]))?;
@@ -494,8 +472,6 @@ pub fn image_from_js(value: &JsValue) -> Result<Image, JsValue> {
         .collect();
     Image::new(width, height, colors).map_err(throw)
 }
-
-// COLORS
 
 pub fn color_to_js(color: Color) -> JsValue {
     [color.r, color.g, color.b, color.a]
@@ -534,9 +510,6 @@ pub fn colors_from_js(value: &JsValue) -> Result<Vec<Color>, JsValue> {
     array.iter().map(|color| color_from_js(&color)).collect()
 }
 
-// CHANCE
-
-/// A seeded random stream, opened from a number or a bigint seed.
 #[wasm_bindgen]
 pub struct Rng {
     stream: Stream,
@@ -544,34 +517,27 @@ pub struct Rng {
 
 #[wasm_bindgen]
 impl Rng {
-    /// Opens the stream on the seed.
     #[wasm_bindgen(constructor)]
     pub fn new(seed: JsValue) -> Result<Rng, JsValue> {
         Ok(Rng {
             stream: Stream::new(u64_from_js(&seed)?),
         })
     }
-    /// Draws a float at or above zero and below one.
     pub fn unit(&mut self) -> f64 {
         self.stream.unit()
     }
-    /// Draws an integer below n, or zero when n is zero.
     pub fn below(&mut self, n: usize) -> usize {
         self.stream.below(n)
     }
-    /// Draws an integer between lo and hi inclusive, or lo when hi is not above lo.
     pub fn range(&mut self, lo: f64, hi: f64) -> f64 {
         self.stream.range(lo as i64, hi as i64) as f64
     }
-    /// Draws a fair coin flip.
     pub fn boolean(&mut self) -> bool {
         self.stream.boolean()
     }
-    /// Returns true with probability p.
     pub fn chance(&mut self, p: f64) -> bool {
         self.stream.chance(p)
     }
-    /// Draws amount distinct indices below length, or every index when amount is larger.
     pub fn sample_indices(&mut self, length: usize, amount: usize) -> Vec<u32> {
         self.stream
             .sample_indices(length, amount)
@@ -579,13 +545,11 @@ impl Rng {
             .map(|index| index as u32)
             .collect()
     }
-    /// Draws one item of the array, the same draw as Rust's choice.
     pub fn choice(&mut self, items: JsValue) -> Result<JsValue, JsValue> {
         let indices: Vec<u32> = (0..length(&items)?).collect();
         let index = *self.stream.choice(&indices).map_err(throw)?;
         js_sys::Reflect::get_u32(&items, index)
     }
-    /// Shuffles the array in place, the same permutation as Rust's shuffle.
     pub fn shuffle(&mut self, items: JsValue) -> Result<(), JsValue> {
         let mut order: Vec<u32> = (0..length(&items)?).collect();
         self.stream.shuffle(&mut order);
@@ -598,12 +562,10 @@ impl Rng {
         }
         Ok(())
     }
-    /// Prints the stream state, the way an optional stream crosses in.
     #[wasm_bindgen(js_name = "__state")]
     pub fn state(&self) -> Result<String, JsValue> {
         serde_json::to_string(&self.stream).map_err(|error| refuse(&error.to_string()))
     }
-    /// Reads a stream state back, the way an optional stream crosses out.
     #[wasm_bindgen(js_name = "__restore")]
     pub fn restore(&mut self, state: &str) -> Result<(), JsValue> {
         self.stream = serde_json::from_str(state).map_err(|error| refuse(&error.to_string()))?;

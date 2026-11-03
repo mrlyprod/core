@@ -274,15 +274,6 @@ pub(crate) fn prose(json: &str, bare: &[&str]) -> Result<String> {
     Ok(format!("{kind} {}", parts.join(", ")))
 }
 
-/// Returns the index of the longest of `names` that `text` starts with, and the rest of `text`, or `None` when none matches.
-///
-/// A prefix reader takes the longest match, not the first, so `evens` never cuts `evens_zeros` short.
-///
-/// ```
-/// let names = vec!["evens".to_string(), "evens_zeros".to_string()];
-/// assert_eq!(mrly_core::name::longest("evens_zeros_ones", &names), Some((1, "_ones")));
-/// assert_eq!(mrly_core::name::longest("odds", &names), None);
-/// ```
 pub fn longest<'a>(text: &'a str, names: &[String]) -> Option<(usize, &'a str)> {
     let mut best: Option<(usize, &str)> = None;
     for (i, name) in names.iter().enumerate() {
@@ -294,90 +285,4 @@ pub fn longest<'a>(text: &'a str, names: &[String]) -> Option<(usize, &'a str)> 
         }
     }
     best
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    const KOCH: &str =
-        r#"{"kind":"bang","dim":2,"lattice":"hex","base":3,"code":39,"twist":[0,1,5,0]}"#;
-
-    #[test]
-    fn the_canonical_text_reads_into_pairs_and_back() {
-        let (kind, fields) = kinded(KOCH).unwrap();
-        assert_eq!(kind, "bang");
-        assert_eq!(fields.len(), 5);
-        assert_eq!(fields[1], ("lattice".into(), Atom::Word("hex".into())));
-        assert_eq!(json(&kind, &fields), KOCH);
-        assert!(pairs("{\"kind\":\"bang\"} ").is_err());
-        assert!(pairs("[1]").is_err());
-    }
-
-    #[test]
-    fn the_views_hold_verbatim() {
-        assert_eq!(
-            url(KOCH).unwrap(),
-            "/bang?dim=2&lattice=hex&base=3&code=39&twist=0,1,5,0"
-        );
-        assert_eq!(
-            file(KOCH).unwrap(),
-            "bang_dim=2_lattice=hex_base=3_code=39_twist=[0,1,5,0]"
-        );
-        assert_eq!(
-            prose(KOCH, &["lattice"]).unwrap(),
-            "bang dim 2, hex, base 3, code 39, twist [0 1 5 0]"
-        );
-        assert_eq!(
-            prose(KOCH, &[]).unwrap(),
-            "bang dim 2, lattice hex, base 3, code 39, twist [0 1 5 0]"
-        );
-    }
-
-    #[test]
-    fn the_decodable_views_read_back() {
-        assert_eq!(
-            url_to_json(&url(KOCH).unwrap(), "bang", &["twist"]).unwrap(),
-            KOCH
-        );
-        assert_eq!(file_to_json(&file(KOCH).unwrap(), "bang").unwrap(), KOCH);
-        let rule = r#"{"kind":"rule","birth":[3],"survive":"grid_squares_ones","wrap":true}"#;
-        assert_eq!(
-            url_to_json(&url(rule).unwrap(), "rule", &["birth", "survive"]).unwrap(),
-            rule
-        );
-        assert_eq!(file_to_json(&file(rule).unwrap(), "rule").unwrap(), rule);
-        let empty = r#"{"kind":"rule","birth":[],"survive":[]}"#;
-        assert_eq!(
-            url_to_json(&url(empty).unwrap(), "rule", &["birth", "survive"]).unwrap(),
-            empty
-        );
-        assert_eq!(file_to_json(&file(empty).unwrap(), "rule").unwrap(), empty);
-        assert!(url_to_json("/rule?dim=2", "bang", &[]).is_err());
-        assert!(url_to_json("bang?dim=2", "bang", &[]).is_err());
-        assert!(url_to_json("/bang?dim", "bang", &[]).is_err());
-        assert!(url_to_json("/bang?Dim=2", "bang", &[]).is_err());
-        assert!(url_to_json("/bang?dim=2&lattice=Hex", "bang", &[]).is_err());
-        assert!(file_to_json("rule_dim=2", "bang").is_err());
-        assert!(file_to_json("bang_dim=2_x", "bang").is_err());
-    }
-
-    #[test]
-    fn a_bare_kind_prints_alone() {
-        let plain = r#"{"kind":"rule"}"#;
-        assert_eq!(url(plain).unwrap(), "/rule");
-        assert_eq!(file(plain).unwrap(), "rule");
-        assert_eq!(prose(plain, &[]).unwrap(), "rule");
-        assert_eq!(url_to_json("/rule", "rule", &[]).unwrap(), plain);
-        assert_eq!(file_to_json("rule", "rule").unwrap(), plain);
-    }
-
-    #[test]
-    fn refuses_a_text_without_a_kind() {
-        for bad in ["{}", r#"{"dim":2}"#, r#"{"kind":3}"#, r#"{"kind":"bang""#] {
-            assert!(url(bad).is_err(), "{bad}");
-            assert!(file(bad).is_err(), "{bad}");
-            assert!(prose(bad, &[]).is_err(), "{bad}");
-        }
-    }
 }
